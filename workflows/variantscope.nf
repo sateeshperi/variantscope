@@ -9,6 +9,15 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_vari
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    GENOME PARAMETER VALUES
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+params.fasta         = getGenomeAttribute('fasta')
+params.fasta_index   = getGenomeAttribute('fasta_index')
+params.bwa_index     = getGenomeAttribute('bwa')
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
@@ -20,6 +29,14 @@ workflow VARIANTSCOPE {
     main:
 
     ch_versions = Channel.empty()
+
+    ch_samplesheet = samplesheet
+                        .branch { meta, fastqs ->
+                            normal  : fastqs.size() == 1
+                                return [ meta, fastqs.flatten() ]
+                            tumor: fastqs.size() > 1
+                                return [ meta, fastqs.flatten() ]
+                        }
 
     //
     // Collate and save software versions
