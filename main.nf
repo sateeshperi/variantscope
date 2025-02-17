@@ -13,7 +13,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { VARIANTSCOPE  } from './workflows/variantscope'
+include { VARIANTSCOPE            } from './workflows/variantscope'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_variantscope_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_variantscope_pipeline'
 /*

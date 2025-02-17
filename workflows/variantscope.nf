@@ -12,9 +12,9 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_vari
     GENOME PARAMETER VALUES
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-params.fasta         = getGenomeAttribute('fasta')
-params.fasta_index   = getGenomeAttribute('fasta_index')
-params.bwa_index     = getGenomeAttribute('bwa')
+// params.fasta         = getGenomeAttribute('fasta')
+// params.fasta_index   = getGenomeAttribute('fasta_index')
+// params.bwa_index     = getGenomeAttribute('bwa')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,18 +25,44 @@ params.bwa_index     = getGenomeAttribute('bwa')
 workflow VARIANTSCOPE {
 
     take:
-    ch_samplesheet // channel: samplesheet read in from --input
+    samplesheet // channel: samplesheet read in from --input
     main:
 
     ch_versions = Channel.empty()
 
-    ch_samplesheet = samplesheet
-                        .branch { meta, fastqs ->
-                            normal  : fastqs.size() == 1
-                                return [ meta, fastqs.flatten() ]
-                            tumor: fastqs.size() > 1
-                                return [ meta, fastqs.flatten() ]
-                        }
+    // Read the samplesheet CSV into a channel of maps
+    ch_samplesheet = Channel.fromPath(params.input)
+    .splitCsv(header: true)
+    // Create a new grouping key by removing ".tumor" / ".normal" from sample_id
+    .map { row ->
+        def baseSample = row.sample_id.replaceAll(/(\.tumor|\.normal)$/, '')
+        tuple(
+            baseSample,
+            [
+                group_id      : row.group_id,
+                subject_id    : row.subject_id,
+                sample_id     : row.sample_id,
+                sample_type   : row.sample_type,
+                sequence_type : row.sequence_type,
+                filetype      : row.filetype,
+                filepath      : row.filepath,
+                indexpath     : row.indexpath
+            ]
+        )
+    }
+    .groupTuple()
+    // Convert grouped rows into a structure containing both tumor and normal info
+    .map { baseSampleId, rows ->
+        def tumor  = rows.find { it.sample_type == 'tumor' }
+        def normal = rows.find { it.sample_type == 'normal' }
+        [
+            sample_id: baseSampleId,
+            tumor    : tumor,
+            normal   : normal
+        ]
+    }
+
+    ch_samplesheet.view()
 
     //
     // Collate and save software versions

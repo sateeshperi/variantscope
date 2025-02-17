@@ -1,3 +1,5 @@
 group_id,subject_id,sample_id,sample_type,sequence_type,filetype,filepath,indexpath
 subject_a,subject_a,subject_a.tumor,tumor,dna,bam,assets/subject_a.tumor.dna.bwa-mem2_2.2.1.markdups.bam,assets/subject_a.tumor.dna.bwa-mem2_2.2.1.markdups.bam.bai
 subject_a,subject_a,subject_a.normal,normal,dna,bam,assets/subject_a.normal.dna.bwa-mem2_2.2.1.markdups.bam,assets/subject_a.normal.dna.bwa-mem2_2.2.1.markdups.bam.bai
+subject_b,subject_b,subject_b.tumor,tumor,dna,bam,assets/subject_b.tumor.dna.bwa-mem2_2.2.1.markdups.bam,assets/subject_b.tumor.dna.bwa-mem2_2.2.1.markdups.bam.bai
+subject_b,subject_b,subject_b.normal,normal,dna,bam,assets/subject_b.normal.dna.bwa-mem2_2.2.1.markdups.bam,assets/subject_b.normal.dna.bwa-mem2_2.2.1.markdups.bam.bai
