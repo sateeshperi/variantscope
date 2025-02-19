@@ -1,4 +1,4 @@
-process GRIDSS_GRIDSS {
+process GRIDSS {
     tag "$meta.id"
     label 'process_medium'
 
@@ -8,13 +8,13 @@ process GRIDSS_GRIDSS {
         'biocontainers/gridss:2.13.2--h270b39a_0' }"
 
     input:
-    tuple val(meta) , path(inputs)
-    tuple val(meta2), path(fasta)
-    tuple val(meta3), path(fasta_fai)
-    tuple val(meta4), path(bwa_index)
+    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai),
+    path(fasta),
+    path(genome_fai),
+    path(genome_dict)
 
     output:
-    tuple val(meta), path("*.vcf.gz")       , emit: vcf
+    tuple val(meta), path("${meta.id}_gridss.vcf")       , emit: vcf
     path "versions.yml"                     , emit: versions
 
     when:
@@ -23,41 +23,32 @@ process GRIDSS_GRIDSS {
     script:
     def args    = task.ext.args ?: ''
     def prefix  = task.ext.prefix ?: "${meta.id}"
-    def VERSION = '2.13.2' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
-    def bwa     = bwa_index ? "cp -s ${bwa_index}/* ." : ""
     """
-    ${bwa}
 
     gridss \\
-        --output ${prefix}.vcf.gz \\
         --reference ${fasta} \\
         --threads ${task.cpus} \\
         --jvmheap ${task.memory.toGiga() - 1}g \\
         --otherjvmheap ${task.memory.toGiga() - 1}g \\
-        $args \\
-        ${inputs}
+        --jar /home/ubuntu/tools/gridss-2.13.2/gridss-2.13.2-gridss-jar-with-dependencies.jar \\
+        ${tumorbam} ${normalbam} \\
+        -o ${prefix}_gridss.vcf
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gridss: ${VERSION}
+        gridss: \$(gridss --version 2>&1 | sed 's/^.*GRIDSS version: //; s/ .*\$//')
     END_VERSIONS
     """
 
     stub:
-    def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def VERSION = '2.13.2' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
-
-    def steps = args.contains("-s ") ? args.split('-s ')[-1].split(" ")[0] :
-                args.contains("--steps ") ? args.split('--steps ')[-1].split(" ")[0] :
-                "all"
-    def vcf = steps.contains("call") || steps.contains("all") ? "echo '' | gzip > ${prefix}.vcf.gz" : ""
     """
-    ${vcf}
+    touch ${prefix}_gridss.vcf
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gridss: ${VERSION}
+        gridss: 2.13.2
     END_VERSIONS
     """
 }
+
