@@ -6,7 +6,7 @@
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_variantscope_pipeline'
-
+//include {BAM_VCF_SV_CALLING} from '../subworkflows/local/bam_vcf_sv_calling/main'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     GENOME PARAMETER VALUES
@@ -31,38 +31,30 @@ workflow VARIANTSCOPE {
     ch_versions = Channel.empty()
 
     // Read the samplesheet CSV into a channel of maps
-    ch_samplesheet = Channel.fromPath(params.input)
-    .splitCsv(header: true)
-    // Create a new grouping key by removing ".tumor" / ".normal" from sample_id
-    .map { row ->
-        def baseSample = row.sample_id.replaceAll(/(\.tumor|\.normal)$/, '')
-        tuple(
-            baseSample,
-            [
-                group_id      : row.group_id,
-                subject_id    : row.subject_id,
-                sample_id     : row.sample_id,
-                sample_type   : row.sample_type,
-                sequence_type : row.sequence_type,
-                filetype      : row.filetype,
-                filepath      : row.filepath,
-                indexpath     : row.indexpath
-            ]
-        )
-    }
-    .groupTuple()
-    // Convert grouped rows into a structure containing both tumor and normal info
-    .map { baseSampleId, rows ->
-        def tumor  = rows.find { it.sample_type == 'tumor' }
-        def normal = rows.find { it.sample_type == 'normal' }
-        [
-            sample_id: baseSampleId,
-            tumor    : tumor,
-            normal   : normal
-        ]
-    }
+    ch_bam = Channel.fromPath(params.input)
+        .splitCsv(header: true)
+        .map { row -> tuple(row.subject_id, row) }
+        .groupTuple()
+        .map { subject_id, rows ->
+            def tumor = rows.find { it.sample_type == 'tumor' }
+            def normal = rows.find { it.sample_type == 'normal' }
+            if (tumor && normal) {
+                [
+                    [id: subject_id],  // meta
+                    file(tumor.filepath),   // tumor bam
+                    file(tumor.indexpath),  // tumor bai
+                    file(normal.filepath),  // normal bam
+                    file(normal.indexpath)  // normal bai
+                ]
+            }
+        }
+        .filter { it != null }
 
-    ch_samplesheet.view()
+
+    ch_bam.view()
+
+    //ch_bam|BAM_VCF_SV_CALLING
+
 
     //
     // Collate and save software versions
