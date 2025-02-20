@@ -1,4 +1,6 @@
-include { GRIDSS } from '../../../modules/nf-core/gridss/gridss/main'
+include { GRIDSS        } from '../../../modules/nf-core/gridss/gridss/main'
+include { MANTA_SOMATIC } from '../../../modules/nf-core/manta/somatic/main'  
+include { SVABA         } from '../../../modules/nf-core/svaba/main'  
 include { GRIPSS_SOMATIC } from '../../../modules/local/gripss/somatic/main'
 
 params.genome = params.genome ?: "${projectDir}/assets/references/hg38.fa"
