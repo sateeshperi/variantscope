@@ -40,7 +40,9 @@ workflow VARIANTSCOPE {
             def normal = rows.find { it.sample_type == 'normal' }
             if (tumor && normal) {
                 [
-                    [id: subject_id],  // meta
+                    [id: subject_id,
+                    tumor_id: tumor.sample_id,
+                    normal_id: normal.sample_id],  // meta
                     file(tumor.filepath),   // tumor bam
                     file(tumor.indexpath),  // tumor bai
                     file(normal.filepath),  // normal bam
@@ -53,7 +55,7 @@ workflow VARIANTSCOPE {
 
     //ch_bam.view()
 
-    ch_bam|BAM_VCF_SV_CALLING
+   ch_bam|BAM_VCF_SV_CALLING
 
 
     //
