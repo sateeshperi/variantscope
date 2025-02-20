@@ -58,8 +58,10 @@ workflow VARIANTSCOPE {
 
    ch_bam|BAM_VCF_SV_CALLING
 
-   ch_bam|CNV_CALLING
+    CNV_CALLING(ch_bam,
+                BAM_VCF_SV_CALLING.out.gripps_filtered_vcf)
 
+   
 
     //
     // Collate and save software versions
