@@ -36,12 +36,10 @@ workflow BAM_VCF_SV_CALLING {
         .combine(genome_dict)
     )
     ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
-/*
+
     emit:
-    bam      = SAMTOOLS_SORT.out.bam           // channel: [ val(meta), [ bam ] ]
-    bai      = SAMTOOLS_INDEX.out.bai          // channel: [ val(meta), [ bai ] ]
-    csi      = SAMTOOLS_INDEX.out.csi          // channel: [ val(meta), [ csi ] ]
-*/
+    gripps_filtered_vcf      = GRIPSS_SOMATIC.out.filtered_vcf 
+
     versions = ch_versions                     // channel: [ versions.yml ]
 }
 
