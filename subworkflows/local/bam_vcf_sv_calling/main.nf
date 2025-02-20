@@ -1,4 +1,5 @@
 include { GRIDSS } from '../../../modules/nf-core/gridss/gridss/main'
+include { GRIPSS_SOMATIC } from '../../../modules/local/gripss/somatic/main'
 
 params.genome = params.genome ?: "${projectDir}/assets/references/hg38.fa"
 params.genome_fai = params.genome_fai ?: "${projectDir}/assets/references/hg38.fa.fai"
@@ -25,10 +26,15 @@ workflow BAM_VCF_SV_CALLING {
 
     ch_versions = ch_versions.mix(GRIDSS.out.versions.first())
 
-/*
-    GRIPSS_SOMATIC ( GRIDSS.out.vcf )
-    ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
 
+    GRIPSS_SOMATIC(GRIDSS.out.vcf
+        .combine(Channel.of('hg38'))  // placeholder, this should be a version in a config file
+        .combine(genome)
+        .combine(genome_fai)
+        .combine(genome_dict)
+    )
+    ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
+/*
     emit:
     bam      = SAMTOOLS_SORT.out.bam           // channel: [ val(meta), [ bam ] ]
     bai      = SAMTOOLS_INDEX.out.bai          // channel: [ val(meta), [ bai ] ]
