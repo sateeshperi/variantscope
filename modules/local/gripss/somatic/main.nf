@@ -16,6 +16,7 @@ process GRIPSS_SOMATIC {
 
     output:
     tuple val(meta), path("${meta.tumor_id}.gripss.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.somatic.vcf.gz.tbi")       , emit: vcf
+    tuple val(meta), path("${meta.tumor_id}.gripss.filtered.vcf.gz"), path("${meta.tumor_id}.gripss.filtered.vcf.gz.tbi")       , emit: filtered_vcf
     path "versions.yml"           , emit: versions
 
     when:
@@ -43,6 +44,8 @@ process GRIPSS_SOMATIC {
 
     touch ${meta.tumor_id}.gripss.somatic.vcf.gz
     touch ${meta.tumor_id}.gripss.somatic.vcf.gz.tbi
+    touch ${meta.tumor_id}.gripss.filtered.vcf.gz
+    touch ${meta.tumor_id}.gripss.filtered.vcf.gz.tbi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
