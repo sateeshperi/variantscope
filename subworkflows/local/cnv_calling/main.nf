@@ -39,7 +39,7 @@ workflow CNV_CALLING {
         .combine(gc_profile)
     )
     ch_versions = ch_versions.mix(COBALT.out.versions.first())
-   
+   /*
     ch_purple_input = ch_bam
         .combine(AMBER.out.amber_dir,by:[0])
         .combine(COBALT.out.cobalt_dir,by:[0])
@@ -54,7 +54,7 @@ workflow CNV_CALLING {
         ensembl_path
     )
 
-    
+    */
    
 
     versions = ch_versions                     // channel: [ versions.yml ]
