@@ -7,6 +7,7 @@ include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_variantscope_pipeline'
 include {BAM_VCF_SV_CALLING} from '../subworkflows/local/bam_vcf_sv_calling/main'
+include {CNV_CALLING} from '../subworkflows/local/cnv_calling/main'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     GENOME PARAMETER VALUES
@@ -56,6 +57,8 @@ workflow VARIANTSCOPE {
     //ch_bam.view()
 
    ch_bam|BAM_VCF_SV_CALLING
+
+   ch_bam|CNV_CALLING
 
 
     //
