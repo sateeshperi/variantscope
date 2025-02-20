@@ -8,24 +8,28 @@ process GRIPSS_SOMATIC {
         'biocontainers/hmftools-gripss:2.4--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(bam)
+    tuple val(meta), path(gridss_vcf),
+    val(version),
+    path(fasta),
+    path(genome_fai),
+    path(genome_dict)
 
     output:
-    tuple val(meta), path("*.bam"), emit: bam
+    tuple val(meta), path("${meta.tumor_id}.gripss.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.somatic.vcf.gz.tbi")       , emit: vcf
     path "versions.yml"           , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def args = task.ext.args ?: ''
+
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    gripss \\
-        $args \\
-        -@ $task.cpus \\
-        -o ${prefix}.bam \\
-        $bam
+    java -jar ~/tools/gripss_v2.4.jar \\
+        -sample ${meta.tumor_id} -reference ${meta.normal_id} \\
+        -vcf ${gridss_vcf} -ref_genome_version ${version} \\
+        -ref_genome ${fasta} -output_dir ./
+
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -37,7 +41,8 @@ process GRIPSS_SOMATIC {
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
 
-    touch ${prefix}.bam
+    touch ${meta.tumor_id}.gripss.somatic.vcf.gz
+    touch ${meta.tumor_id}.gripss.somatic.vcf.gz.tbi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
