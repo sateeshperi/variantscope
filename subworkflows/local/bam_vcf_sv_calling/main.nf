@@ -35,6 +35,13 @@ workflow BAM_VCF_SV_CALLING {
         params.genome_fai,
         params.genome_dict
     )
+
+    MANTA_SOMATIC(ch_bam,
+        params.genome,
+        params.genome_fai,
+        params.genome_dict
+    )
+
     ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
 
     emit:
