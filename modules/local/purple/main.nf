@@ -8,13 +8,13 @@ process PURPLE {
         'biocontainers/hmftools-purple:4.0.2--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai), path(amber),path(cobalt), path(gripps_filtered_vcf)
-    val(version)
-    path(genome)
-    path(genome_fai)
-    path(genome_dict)
-    path(gc_profile)
-    path(ensembl_path)
+    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai), path(amber),path(cobalt), path(gripps_filtered_vcf), path(gripps_filtered_vcf_tbi)
+    val version
+    path genome
+    path genome_fai
+    path genome_dict
+    path gc_profile
+    path ensembl_path
 
     output:
     tuple val(meta), path('purple/'), emit: purple_dir
@@ -28,7 +28,7 @@ process PURPLE {
 
     """
 
-    java -jar ~/tools/purple_v4.0.jar \\
+    java -jar ~/tools/purple_v4.0.jar \\   //this needs to be updated as per container executable
         -Xmx${Math.round(task.memory.bytes * 0.95)}
         -reference ${meta.normal_id} \\
         -tumor ${meta.tumor_id} \\
