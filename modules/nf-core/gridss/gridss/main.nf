@@ -8,10 +8,10 @@ process GRIDSS {
         'biocontainers/gridss:2.13.2--h270b39a_0' }"
 
     input:
-    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai),
-    path(fasta),
-    path(genome_fai),
-    path(genome_dict)
+    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai)
+    path genome
+    path genome_fai
+    path genome_dict
 
     output:
     tuple val(meta), path("${meta.id}_gridss.vcf")       , emit: vcf
@@ -26,7 +26,7 @@ process GRIDSS {
     """
 
     gridss \\
-        --reference ${fasta} \\
+        --reference ${genome} \\
         --threads ${task.cpus} \\
         --jvmheap ${task.memory.toGiga() - 1}g \\
         --otherjvmheap ${task.memory.toGiga() - 1}g \\
