@@ -9,10 +9,10 @@ process MANTA_SOMATIC {
         'biocontainers/manta:1.6.0--h9ee0642_1' }"
 
     input:
-    tuple val(meta), path(input_normal), path(input_index_normal), path(input_tumor), path(input_index_tumor), path(target_bed), path(target_bed_tbi)
-    tuple val(meta2), path(fasta)
-    tuple val(meta3), path(fai)
-    path(config)
+    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai)
+    path genome
+    path genome_fai
+    path genome_dict
 
     output:
     tuple val(meta), path("*.candidate_small_indels.vcf.gz")     , emit: candidate_small_indels_vcf
@@ -35,13 +35,10 @@ process MANTA_SOMATIC {
     def config_option = config ? "--config ${config}" : ""
     """
     configManta.py \\
-        --tumorBam $input_tumor \\
-        --normalBam $input_normal \\
-        --reference $fasta \\
-        ${config_option} \\
-        --runDir manta \\
-        $options_manta \\
-        $args
+        --tumorBam $tumorbam \\
+        --normalBam $normalbam \\
+        --reference $genome \\
+        --runDir manta 
 
     python manta/runWorkflow.py -m local -j $task.cpus
 
