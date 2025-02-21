@@ -8,8 +8,8 @@ process AMBER {
         'biocontainers/hmftools-amber:4.0.1--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai),
-    val(version),
+    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai)
+    val(version)
     path(amber_germline_sites)
 
 
@@ -31,7 +31,7 @@ process AMBER {
         -tumor_bam ${tumorbam} \\
         -output_dir amber/ \\
         -threads ${task.cpus} \\
-        -loci ${amber_germline_sites} 
+        -loci ${amber_germline_sites} \\
         -ref_genome_version ${version}
 
 
