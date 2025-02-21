@@ -9,14 +9,7 @@ params.genome = params.genome ?: "${projectDir}/assets/references/hg38.fa"
 params.genome_fai = params.genome_fai ?: "${projectDir}/assets/references/hg38.fa.fai"
 params.genome_dict = params.genome_dict ?: "${projectDir}/assets/references/hg38.dict"
 params.ensembl_path = params.ensembl_path ?: "${projectDir}/assets/references/ensembl"
-
-    
-genome                  = Channel.of(file(params.genome))
-genome_fai              = Channel.of(file(params.genome_fai))
-genome_dict             = Channel.of(file(params.genome_dict))
-amber_germline_sites                  = Channel.of(file(params.amber_germline_sites))
-gc_profile                            = Channel.of(file(params.gc_profile))
-ensembl_path                          = Channel.of(file(params.ensembl_path))
+params.genome_version = params.genome_version ?: 'hg38'
 
 workflow CNV_CALLING {
 
@@ -28,34 +21,34 @@ workflow CNV_CALLING {
 
     ch_versions = Channel.empty()
 
-    AMBER(ch_bam
-        .combine(Channel.of('hg38'))
-        .combine(amber_germline_sites)
+    AMBER(ch_bam,
+        params.genome_version,
+        params.amber_germline_sites
     )
 
     ch_versions = ch_versions.mix(AMBER.out.versions.first())
 
-    COBALT(ch_bam
-        .combine(gc_profile)
+    COBALT(ch_bam,
+        params.gc_profile
     )
     ch_versions = ch_versions.mix(COBALT.out.versions.first())
-   /*
+
     ch_purple_input = ch_bam
         .combine(AMBER.out.amber_dir,by:[0])
         .combine(COBALT.out.cobalt_dir,by:[0])
         .combine(gripps_filtered_vcf,by:[0])
 
+
     PURPLE(ch_purple_input,
-        Channel.of('hg38'),
-        genome,
-        genome_fai,
-        genome_dict,
-        gc_profile,
-        ensembl_path
+        params.genome_version,
+        params.genome,
+        params.genome_fai,
+        params.genome_dict,
+        params.gc_profile,
+        params.ensembl_path
     )
 
-    */
-   
+    ch_versions = ch_versions.mix(PURPLE.out.versions.first())
 
     versions = ch_versions                     // channel: [ versions.yml ]
 
