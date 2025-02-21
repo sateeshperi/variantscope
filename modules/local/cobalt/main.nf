@@ -8,8 +8,8 @@ process COBALT {
         'biocontainers/hmftools-cobalt:1.16--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai),
-    path(gc_profile)
+    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai)
+    path gc_profile
 
     output:
     tuple val(meta), path('cobalt/'), emit: cobalt_dir
