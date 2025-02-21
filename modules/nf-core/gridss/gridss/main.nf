@@ -30,7 +30,6 @@ process GRIDSS {
         --threads ${task.cpus} \\
         --jvmheap ${task.memory.toGiga() - 1}g \\
         --otherjvmheap ${task.memory.toGiga() - 1}g \\
-        --jar /home/ubuntu/tools/gridss-2.13.2/gridss-2.13.2-gridss-jar-with-dependencies.jar \\
         ${tumorbam} ${normalbam} \\
         -o ${prefix}_gridss.vcf
 
