@@ -25,22 +25,19 @@ process MANTA_SOMATIC {
     tuple val(meta), path("*.somatic_sv.vcf.gz.tbi")             , emit: somatic_sv_vcf_tbi
     path "versions.yml"                                          , emit: versions
 
-    when:
-    task.ext.when == null || task.ext.when
-
     script:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
-    def options_manta = target_bed ? "--callRegions $target_bed" : ""
-    def config_option = config ? "--config ${config}" : ""
+    def args          = task.ext.args   ?: ''
+    def prefix        = task.ext.prefix ?: "${meta.id}"
+    //def options_manta = target_bed      ? "--callRegions $target_bed" : ""
+    //def config_option = config          ? "--config ${config}" : ""
     """
     configManta.py \\
-        --tumorBam $tumorbam \\
-        --normalBam $normalbam \\
-        --reference $genome \\
+        --tumorBam ${tumorbam} \\
+        --normalBam ${normalbam} \\
+        --reference ${genome} \\
         --runDir manta 
 
-    python manta/runWorkflow.py -m local -j $task.cpus
+    python manta/runWorkflow.py -m local -j ${task.cpus}
 
     mv manta/results/variants/candidateSmallIndels.vcf.gz \\
         ${prefix}.candidate_small_indels.vcf.gz
@@ -61,7 +58,7 @@ process MANTA_SOMATIC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        manta: \$( configManta.py --version )
+        manta: \$(configManta.py --version)
     END_VERSIONS
     """
 
@@ -79,7 +76,7 @@ process MANTA_SOMATIC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        manta: \$( configManta.py --version )
+        manta: \$(configManta.py --version)
     END_VERSIONS
     """
 }

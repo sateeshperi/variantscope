@@ -15,22 +15,17 @@ process GRIPSS_SOMATIC {
     path genome_dict
 
     output:
-    tuple val(meta), path("${meta.tumor_id}.gripss.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.somatic.vcf.gz.tbi")       , emit: vcf
-    tuple val(meta), path("${meta.tumor_id}.gripss.filtered.vcf.gz"), path("${meta.tumor_id}.gripss.filtered.vcf.gz.tbi")       , emit: filtered_vcf
-    path "versions.yml"           , emit: versions
-
-    when:
-    task.ext.when == null || task.ext.when
+    tuple val(meta), path("${meta.tumor_id}.gripss.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.somatic.vcf.gz.tbi")   , emit: vcf
+    tuple val(meta), path("${meta.tumor_id}.gripss.filtered.vcf.gz"), path("${meta.tumor_id}.gripss.filtered.vcf.gz.tbi") , emit: filtered_vcf
+    path "versions.yml"                                                                                                   , emit: versions
 
     script:
-
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     java -jar ~/tools/gripss_v2.4.jar \\
         -sample ${meta.tumor_id} -reference ${meta.normal_id} \\
         -vcf ${gridss_vcf} -ref_genome_version ${version} \\
         -ref_genome ${fasta} -output_dir ./
-
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -41,7 +36,6 @@ process GRIPSS_SOMATIC {
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-
     touch ${meta.tumor_id}.gripss.somatic.vcf.gz
     touch ${meta.tumor_id}.gripss.somatic.vcf.gz.tbi
     touch ${meta.tumor_id}.gripss.filtered.vcf.gz

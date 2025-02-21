@@ -6,16 +6,17 @@
 include { paramsSummaryMap       } from 'plugin/nf-schema'
 include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_variantscope_pipeline'
-include {BAM_VCF_SV_CALLING} from '../subworkflows/local/bam_vcf_sv_calling/main'
-include {CNV_CALLING} from '../subworkflows/local/cnv_calling/main'
+include { BAM_VCF_SV_CALLING     } from '../subworkflows/local/bam_vcf_sv_calling/main'
+include { CNV_CALLING            } from '../subworkflows/local/cnv_calling/main'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     GENOME PARAMETER VALUES
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-// params.fasta         = getGenomeAttribute('fasta')
-// params.fasta_index   = getGenomeAttribute('fasta_index')
-// params.bwa_index     = getGenomeAttribute('bwa')
+params.genome         = params.genome         ?: "${projectDir}/assets/references/hg38.fa"
+params.genome_fai     = params.genome_fai     ?: "${projectDir}/assets/references/hg38.fa.fai"
+params.genome_dict    = params.genome_dict    ?: "${projectDir}/assets/references/hg38.dict"
+params.genome_version = params.genome_version ?: 'hg38'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -27,6 +28,7 @@ workflow VARIANTSCOPE {
 
     take:
     samplesheet // channel: samplesheet read in from --input
+    
     main:
 
     ch_versions = Channel.empty()
@@ -53,15 +55,14 @@ workflow VARIANTSCOPE {
         }
         .filter { it != null }
 
+   // SV calling Subworkflow
+   BAM_VCF_SV_CALLING(ch_bam)
 
-    //ch_bam.view()
-
-   ch_bam|BAM_VCF_SV_CALLING
-
-    CNV_CALLING(ch_bam,
-                BAM_VCF_SV_CALLING.out.gripps_filtered_vcf)
-
-   
+    // CNV calling Subworkflow
+    // CNV_CALLING(
+    //     ch_bam,
+    //     BAM_VCF_SV_CALLING.out.gripps_filtered_vcf
+    // )
 
     //
     // Collate and save software versions
@@ -77,7 +78,6 @@ workflow VARIANTSCOPE {
 
     emit:
     versions       = ch_versions                 // channel: [ path(versions.yml) ]
-
 }
 
 /*

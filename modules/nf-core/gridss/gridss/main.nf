@@ -14,17 +14,13 @@ process GRIDSS {
     path genome_dict
 
     output:
-    tuple val(meta), path("${meta.id}_gridss.vcf")       , emit: vcf
-    path "versions.yml"                     , emit: versions
-
-    when:
-    task.ext.when == null || task.ext.when
+    tuple val(meta), path("${meta.id}_gridss.vcf") , emit: vcf
+    path "versions.yml"                            , emit: versions
 
     script:
     def args    = task.ext.args ?: ''
     def prefix  = task.ext.prefix ?: "${meta.id}"
     """
-
     gridss \\
         --reference ${genome} \\
         --threads ${task.cpus} \\
@@ -46,7 +42,7 @@ process GRIDSS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gridss: 2.13.2
+        gridss: \$(gridss --version 2>&1 | sed 's/^.*GRIDSS version: //; s/ .*\$//')
     END_VERSIONS
     """
 }
