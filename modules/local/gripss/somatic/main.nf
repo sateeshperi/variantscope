@@ -8,11 +8,11 @@ process GRIPSS_SOMATIC {
         'biocontainers/hmftools-gripss:2.4--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(gridss_vcf),
-    val(version),
-    path(fasta),
-    path(genome_fai),
-    path(genome_dict)
+    tuple val(meta), path(gridss_vcf)
+    val version
+    path fasta
+    path genome_fai
+    path genome_dict
 
     output:
     tuple val(meta), path("${meta.tumor_id}.gripss.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.somatic.vcf.gz.tbi")       , emit: vcf
