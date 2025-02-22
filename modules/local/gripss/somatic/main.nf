@@ -22,10 +22,15 @@ process GRIPSS_SOMATIC {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    java -jar ~/tools/gripss_v2.4.jar \\
-        -sample ${meta.tumor_id} -reference ${meta.normal_id} \\
-        -vcf ${gridss_vcf} -ref_genome_version ${version} \\
-        -ref_genome ${fasta} -output_dir ./
+    gripss \\
+        -Xmx${Math.round(task.memory.bytes * 0.95)} \\
+        -sample ${meta.tumor_id} \\
+        ${reference_arg} \\
+        -vcf ${gridss_vcf} \\
+        -ref_genome ${fasta} \\
+        -ref_genome_version ${version} \\
+        ${output_id_arg} \\
+        -output_dir ./
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
