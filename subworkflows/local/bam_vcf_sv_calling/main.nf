@@ -7,6 +7,9 @@ params.genome         = params.genome         ?: "${projectDir}/assets/reference
 params.genome_fai     = params.genome_fai     ?: "${projectDir}/assets/references/hg38.fa.fai"
 params.genome_dict    = params.genome_dict    ?: "${projectDir}/assets/references/hg38.dict"
 params.genome_version = params.genome_version ?: 'hg38'
+params.dbsnp          = params.dbsnp          ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz"
+params.dbsnp_tbi      = params.dbsnp_tbi      ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz.tbi"
+params.regions        = params.regions        ?: "${projectDir}/assets/references/regions.bed"
 
 workflow BAM_VCF_SV_CALLING {
 
@@ -27,7 +30,7 @@ workflow BAM_VCF_SV_CALLING {
 
     ch_versions = ch_versions.mix(GRIDSS.out.versions.first())
 
-    // GRIPSS 
+    // GRIPSS
     GRIPSS_SOMATIC(
         GRIDSS.out.vcf,
         params.genome_version,  // placeholder, this should be a version in a config file
@@ -41,6 +44,16 @@ workflow BAM_VCF_SV_CALLING {
         params.genome,
         params.genome_fai,
         params.genome_dict
+    )
+
+    // SVABA
+    SVABA(ch_bam,
+        params.genome,
+        params.genome_fai,
+        params.genome_dict,
+        params.dbsnp,
+        params.dbsnp_tbi,
+        params.regions
     )
 
     ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
