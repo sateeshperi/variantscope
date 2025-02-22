@@ -28,7 +28,7 @@ workflow VARIANTSCOPE {
 
     take:
     samplesheet // channel: samplesheet read in from --input
-    
+
     main:
 
     ch_versions = Channel.empty()
@@ -55,18 +55,19 @@ workflow VARIANTSCOPE {
         }
         .filter { it != null }
 
-   // SV calling Subworkflow
-   BAM_VCF_SV_CALLING(ch_bam)
-
+    // SV calling Subworkflow
+    BAM_VCF_SV_CALLING(ch_bam)
+/*
     // CNV calling Subworkflow
-    // CNV_CALLING(
-    //     ch_bam,
-    //     BAM_VCF_SV_CALLING.out.gripps_filtered_vcf
-    // )
+    CNV_CALLING(
+        ch_bam,
+        BAM_VCF_SV_CALLING.out.gripps_filtered_vcf
+    )
 
     //
     // Collate and save software versions
     //
+*/
     softwareVersionsToYAML(ch_versions)
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",
