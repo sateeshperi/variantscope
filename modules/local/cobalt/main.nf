@@ -20,17 +20,15 @@ process COBALT {
 
     script:
     def args = task.ext.args ?: ''
-
-
     """
-    java -jar ~/tools/cobalt_v1.16.jar \\
+    cobalt \\
         -reference ${meta.normal_id} \\
         -reference_bam ${normalbam} \\
         -tumor ${meta.tumor_id} \\
         -tumor_bam ${tumorbam} \\
-        -output_dir cobalt/ \\
         -threads ${task.cpus} \\
-        -gc_profile ${gc_profile}
+        -gc_profile ${gc_profile} \\
+        -output_dir cobalt/
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -43,6 +41,9 @@ process COBALT {
     mkdir -p cobalt/
     touch cobalt/placeholder
 
-    echo -e '${task.process}:\\n  stub: noversions\\n' > versions.yml
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        cobalt: \$(cobalt -version | sed 's/^.* //')
+    END_VERSIONS
     """
 }

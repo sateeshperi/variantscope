@@ -7,12 +7,6 @@
     "items": {
         "type": "object",
         "properties": {
-            "group_id": {
-                "type": "string",
-                "pattern": "^\\S+$",
-                "errorMessage": "Group ID must be provided and cannot contain spaces",
-                "meta": ["id"]
-            },
             "subject_id": {
                 "type": "string",
                 "pattern": "^\\S+$",
@@ -54,7 +48,6 @@
             }
         },
         "required": [
-            "group_id",
             "subject_id",
             "sample_id",
             "sample_type",

@@ -1,6 +1,6 @@
 
 process SVABA {
-    tag "$meta.id"
+    tag "${meta.id}"
     label 'process_single'
 
     conda "${moduleDir}/environment.yml"
@@ -43,21 +43,21 @@ process SVABA {
     def prefix  = task.ext.prefix ?: "${meta.id}"
     def bamlist = normalbam ? "-t ${tumorbam} -n ${normalbam}" : "-t ${tumorbam}"
     def dbsnp   = dbsnp ? "--dbsnp-vcf ${dbsnp}" : ""
-    //def regions = regions ? "--region ${regions}" : ""
-    //def bwa     = bwa_index ? "cp -s ${bwa_index}/* ." : ""
-
+    def regions = regions ? "--region ${regions}" : ""
+    def bwa     = bwa_index ? "cp -s ${bwa_index}/* ." : ""
     """
+    ${bwa}
 
     svaba \\
         run \\
-        $bamlist \\
-        --threads $task.cpus \\
-        $dbsnp \\
-        --id-string $meta.id \\
-        --reference-genome $fasta \\
+        ${bamlist} \\
+        --threads ${task.cpus} \\
+        ${dbsnp} \\
+        --id-string ${meta.id} \\
+        --reference-genome ${fasta} \\
         --g-zip \\
-        $regions \\
-        $args
+        ${regions} \\
+        ${args}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -22,9 +22,8 @@ process AMBER {
 
     script:
     def args = task.ext.args ?: ''
-
     """
-    java -jar ~/tools/amber_v4.0.jar \\
+    amber \\
         -reference ${meta.normal_id} \\
         -reference_bam ${normalbam} \\
         -tumor ${meta.tumor_id} \\
@@ -33,7 +32,6 @@ process AMBER {
         -threads ${task.cpus} \\
         -loci ${amber_germline_sites} \\
         -ref_genome_version ${version}
-
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -46,6 +44,9 @@ process AMBER {
     mkdir -p amber/
     touch amber/placeholder
 
-    echo -e '${task.process}:\\n  stub: noversions\\n' > versions.yml
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        amber: \$(amber -version | sed 's/^.* //')
+    END_VERSIONS
     """
 }

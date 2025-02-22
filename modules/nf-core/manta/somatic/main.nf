@@ -28,8 +28,6 @@ process MANTA_SOMATIC {
     script:
     def args          = task.ext.args   ?: ''
     def prefix        = task.ext.prefix ?: "${meta.id}"
-    //def options_manta = target_bed      ? "--callRegions $target_bed" : ""
-    //def config_option = config          ? "--config ${config}" : ""
     """
     configManta.py \\
         --tumorBam ${tumorbam} \\

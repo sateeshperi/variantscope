@@ -9,26 +9,29 @@ process GRIPSS_SOMATIC {
 
     input:
     tuple val(meta), path(gridss_vcf)
-    val version
-    path fasta
+    val genome_ver
+    path genome_fasta
     path genome_fai
     path genome_dict
 
     output:
-    tuple val(meta), path("${meta.tumor_id}.gripss.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.somatic.vcf.gz.tbi")   , emit: vcf
-    tuple val(meta), path("${meta.tumor_id}.gripss.filtered.vcf.gz"), path("${meta.tumor_id}.gripss.filtered.vcf.gz.tbi") , emit: filtered_vcf
-    path "versions.yml"                                                                                                   , emit: versions
+    tuple val(meta), path('*.gripss.filtered.vcf.gz'), path('*.gripss.filtered.vcf.gz.tbi'), emit: vcf_filtered
+    tuple val(meta), path('*.gripss.somatic.vcf.gz'), path('*.gripss.somatic.vcf.gz.tbi')  , emit: vcf_somatic
+    path 'versions.yml'                                                                    , emit: versions
 
     script:
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    def args          = task.ext.args ?: ''
+    def reference_arg = meta.containsKey('normal_id') ? "-reference ${meta.normal_id}" : ''
+    def output_id_arg = meta.containsKey('normal_id') ? '-output_id somatic' : ''
     """
     gripss \\
         -Xmx${Math.round(task.memory.bytes * 0.95)} \\
+        ${args} \\
         -sample ${meta.tumor_id} \\
         ${reference_arg} \\
         -vcf ${gridss_vcf} \\
-        -ref_genome ${fasta} \\
-        -ref_genome_version ${version} \\
+        -ref_genome ${genome_fasta} \\
+        -ref_genome_version ${genome_ver} \\
         ${output_id_arg} \\
         -output_dir ./
 

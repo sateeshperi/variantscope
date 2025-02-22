@@ -16,6 +16,23 @@
 include { VARIANTSCOPE            } from './workflows/variantscope'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_variantscope_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_variantscope_pipeline'
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    GENOME PARAMETER VALUES
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+ch_genome               = params.genome               ?: "${projectDir}/assets/references/hg38.fa"
+ch_genome_fai           = params.genome_fai           ?: "${projectDir}/assets/references/hg38.fa.fai"
+ch_genome_dict          = params.genome_dict          ?: "${projectDir}/assets/references/hg38.dict"
+ch_genome_version       = params.genome_version       ?: '38'
+ch_dbsnp                = params.dbsnp                ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz"
+ch_dbsnp_tbi            = params.dbsnp_tbi            ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz.tbi"
+ch_regions              = params.regions              ?: "${projectDir}/assets/references/regions.bed"
+ch_amber_germline_sites = params.amber_germline_sites ?: "${projectDir}/assets/references/AmberGermlineSites.38.tsv.gz"
+ch_gc_profile           = params.gc_profile           ?: "${projectDir}/assets/references/GC_profile.1000bp.38.cnp"
+ch_ensembl_path         = params.ensembl_path         ?: "${projectDir}/assets/references/ensembl"
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
@@ -36,7 +53,17 @@ workflow SOWPATILAB_VARIANTSCOPE {
     // WORKFLOW: Run pipeline
     //
     VARIANTSCOPE (
-        samplesheet
+        samplesheet,
+        ch_genome,    
+        ch_genome_fai,
+        ch_genome_dict,
+        ch_genome_version,
+        ch_dbsnp,     
+        ch_dbsnp_tbi,
+        ch_regions,
+        ch_amber_germline_sites,
+        ch_gc_profile,    
+        ch_ensembl_path
     )
 }
 /*

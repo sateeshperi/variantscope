@@ -8,7 +8,15 @@ process PURPLE {
         'biocontainers/hmftools-purple:4.0.2--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(tumorbam), path(tumorbai), path(normalbam), path(normalbai), path(amber),path(cobalt), path(gripps_filtered_vcf), path(gripps_filtered_vcf_tbi)
+    tuple val(meta), 
+        path(tumorbam), 
+        path(tumorbai), 
+        path(normalbam), 
+        path(normalbai),
+        path(gripps_filtered_vcf), 
+        path(gripps_filtered_vcf_tbi)
+    path amber
+    path cobalt
     val version
     path genome
     path genome_fai
@@ -25,11 +33,9 @@ process PURPLE {
 
     script:
     def args = task.ext.args ?: ''
-
     """
-
-    java -jar ~/tools/purple_v4.0.jar \\   //this needs to be updated as per container executable
-        -Xmx${Math.round(task.memory.bytes * 0.95)}
+    purple \\
+        -Xmx${Math.round(task.memory.bytes * 0.95)} \\
         -reference ${meta.normal_id} \\
         -tumor ${meta.tumor_id} \\
         -amber ${amber}/${meta.tumor_id} \\
@@ -42,7 +48,6 @@ process PURPLE {
         -circos \$(which circos)  \\
         -output_dir purple/
 
-
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         purple: \$(purple -version | sed 's/^.* //')
@@ -53,6 +58,9 @@ process PURPLE {
     """
     mkdir purple/
 
-    echo -e '${task.process}:\\n  stub: noversions\\n' > versions.yml
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        purple: \$(purple -version | sed 's/^.* //')
+    END_VERSIONS
     """
 }

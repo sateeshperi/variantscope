@@ -1,56 +1,68 @@
-include {AMBER} from '../../../modules/local/amber/main'
-include {COBALT} from '../../../modules/local/cobalt/main'
-include {PURPLE} from '../../../modules/local/purple/main'
-
-
-params.amber_germline_sites = params.amber_germline_sites ?: "${projectDir}/assets/references/AmberGermlineSites.38.tsv.gz"
-params.gc_profile = params.gc_profile ?: "${projectDir}/assets/references/GC_profile.1000bp.38.cnp"
-params.genome = params.genome ?: "${projectDir}/assets/references/hg38.fa"
-params.genome_fai = params.genome_fai ?: "${projectDir}/assets/references/hg38.fa.fai"
-params.genome_dict = params.genome_dict ?: "${projectDir}/assets/references/hg38.dict"
-params.ensembl_path = params.ensembl_path ?: "${projectDir}/assets/references/ensembl"
-params.genome_version = params.genome_version ?: '38'
+include { AMBER  } from '../../../modules/local/amber/main'
+include { COBALT } from '../../../modules/local/cobalt/main'
+include { PURPLE } from '../../../modules/local/purple/main'
 
 workflow CNV_CALLING {
 
     take:
     ch_bam
+    ch_genome 
+    ch_genome_fai
+    ch_genome_dict
+    ch_genome_version
+    ch_amber_germline_sites
+    ch_gc_profile
+    ch_ensembl_path
     gripps_filtered_vcf
 
     main:
 
     ch_versions = Channel.empty()
 
-    AMBER(ch_bam,
-        params.genome_version,
-        params.amber_germline_sites
+    AMBER(
+        ch_bam,
+        ch_genome_version,
+        ch_amber_germline_sites
     )
 
     ch_versions = ch_versions.mix(AMBER.out.versions.first())
 
-    COBALT(ch_bam,
-        params.gc_profile
+    COBALT(
+        ch_bam,
+        ch_gc_profile
     )
     ch_versions = ch_versions.mix(COBALT.out.versions.first())
 
-    ch_purple_input = ch_bam
-        .combine(AMBER.out.amber_dir,by:[0])
-        .combine(COBALT.out.cobalt_dir,by:[0])
-        .combine(gripps_filtered_vcf,by:[0])
+    // PURPLE
+    // ch_purple_input = Channel.empty()
+    //     .mix(ch_bam)
+    //     .combine(gripps_filtered_vcf, by: [0])
+    //     .map { bam_meta, bam_paths, vcf_paths ->
+    //         [
+    //             bam_meta,            // meta map
+    //             bam_paths[1],        // tumorbam
+    //             bam_paths[2],        // tumorbai
+    //             bam_paths[3],        // normalbam
+    //             bam_paths[4],        // normalbai
+    //             vcf_paths[1],        // gripps_filtered_vcf
+    //             vcf_paths[2]         // gripps_filtered_vcf_tbi
+    //         ]
+    //     }
 
+    // PURPLE(
+    //     ch_purple_input,
+    //     AMBER.out.amber_dir,
+    //     COBALT.out.cobalt_dir,
+    //     ch_genome_version,
+    //     ch_genome,
+    //     ch_genome_fai,
+    //     ch_genome_dict,
+    //     ch_gc_profile,
+    //     ch_ensembl_path
+    // )
 
-    PURPLE(ch_purple_input,
-        params.genome_version,
-        params.genome,
-        params.genome_fai,
-        params.genome_dict,
-        params.gc_profile,
-        params.ensembl_path
-    )
+    // ch_versions = ch_versions.mix(PURPLE.out.versions.first())
 
-    ch_versions = ch_versions.mix(PURPLE.out.versions.first())
-
+    emit:
     versions = ch_versions                     // channel: [ versions.yml ]
-
-
 }

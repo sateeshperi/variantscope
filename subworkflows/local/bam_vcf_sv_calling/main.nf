@@ -3,18 +3,17 @@ include { MANTA_SOMATIC } from '../../../modules/nf-core/manta/somatic/main'
 include { SVABA         } from '../../../modules/nf-core/svaba/main'
 include { GRIPSS_SOMATIC } from '../../../modules/local/gripss/somatic/main'
 
-params.genome         = params.genome         ?: "${projectDir}/assets/references/hg38.fa"
-params.genome_fai     = params.genome_fai     ?: "${projectDir}/assets/references/hg38.fa.fai"
-params.genome_dict    = params.genome_dict    ?: "${projectDir}/assets/references/hg38.dict"
-params.genome_version = params.genome_version ?: '38'
-params.dbsnp          = params.dbsnp          ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz"
-params.dbsnp_tbi      = params.dbsnp_tbi      ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz.tbi"
-params.regions        = params.regions        ?: "${projectDir}/assets/references/regions.bed"
-
 workflow BAM_VCF_SV_CALLING {
 
     take:
     ch_bam // tuple with tumor and normal bam files
+    ch_genome 
+    ch_genome_fai
+    ch_genome_dict
+    ch_genome_version
+    ch_dbsnp
+    ch_dbsnp_tbi
+    ch_regions
 
     main:
 
@@ -23,9 +22,9 @@ workflow BAM_VCF_SV_CALLING {
     // GRIDSS
     GRIDSS(
         ch_bam,
-        params.genome,
-        params.genome_fai,
-        params.genome_dict
+        ch_genome,
+        ch_genome_fai,
+        ch_genome_dict
     )
 
     ch_versions = ch_versions.mix(GRIDSS.out.versions.first())
@@ -33,33 +32,36 @@ workflow BAM_VCF_SV_CALLING {
     // GRIPSS
     GRIPSS_SOMATIC(
         GRIDSS.out.vcf,
-        params.genome_version,  // placeholder, this should be a version in a config file
-        params.genome,
-        params.genome_fai,
-        params.genome_dict
+        ch_genome_version,
+        ch_genome,
+        ch_genome_fai,
+        ch_genome_dict
     )
 
     // MANTA
-    MANTA_SOMATIC(ch_bam,
-        params.genome,
-        params.genome_fai,
-        params.genome_dict
+    MANTA_SOMATIC(
+        ch_bam,
+        ch_genome,
+        ch_genome_fai,
+        ch_genome_dict
     )
 
     // SVABA
-    SVABA(ch_bam,
-        params.genome,
-        params.genome_fai,
-        params.genome_dict,
-        params.dbsnp,
-        params.dbsnp_tbi,
-        params.regions
+    SVABA(
+        ch_bam,
+        ch_genome,
+        ch_genome_fai,
+        ch_genome_dict,
+        ch_dbsnp,
+        ch_dbsnp_tbi,
+        ch_regions
     )
 
     ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
 
     emit:
-    gripps_filtered_vcf = GRIPSS_SOMATIC.out.filtered_vcf // channel: [ versions.yml ]
-    versions            = ch_versions                     // channel: [ versions.yml ]
+    vcf_filtered = GRIPSS_SOMATIC.out.vcf_filtered // channel: [ [ meta ], vcf ]
+    vcf_somatic  = GRIPSS_SOMATIC.out.vcf_somatic // channel: [ [ meta ], vcf ]
+    versions     = ch_versions            // channel: [ versions.yml ]
 }
 
