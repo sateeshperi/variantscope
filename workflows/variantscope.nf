@@ -16,7 +16,7 @@ include { CNV_CALLING            } from '../subworkflows/local/cnv_calling/main'
 params.genome         = params.genome         ?: "${projectDir}/assets/references/hg38.fa"
 params.genome_fai     = params.genome_fai     ?: "${projectDir}/assets/references/hg38.fa.fai"
 params.genome_dict    = params.genome_dict    ?: "${projectDir}/assets/references/hg38.dict"
-params.genome_version = params.genome_version ?: 'hg38'
+params.genome_version = params.genome_version ?: '38'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

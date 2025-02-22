@@ -6,7 +6,7 @@ include { GRIPSS_SOMATIC } from '../../../modules/local/gripss/somatic/main'
 params.genome         = params.genome         ?: "${projectDir}/assets/references/hg38.fa"
 params.genome_fai     = params.genome_fai     ?: "${projectDir}/assets/references/hg38.fa.fai"
 params.genome_dict    = params.genome_dict    ?: "${projectDir}/assets/references/hg38.dict"
-params.genome_version = params.genome_version ?: 'hg38'
+params.genome_version = params.genome_version ?: '38'
 params.dbsnp          = params.dbsnp          ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz"
 params.dbsnp_tbi      = params.dbsnp_tbi      ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz.tbi"
 params.regions        = params.regions        ?: "${projectDir}/assets/references/regions.bed"
