@@ -37,7 +37,7 @@ workflow BAM_VCF_SV_CALLING {
         ch_genome_fai,
         ch_genome_dict
     )
-
+/*
     // MANTA
     MANTA_SOMATIC(
         ch_bam,
@@ -58,7 +58,7 @@ workflow BAM_VCF_SV_CALLING {
     )
 
     ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
-
+*/
     emit:
     vcf_filtered = GRIPSS_SOMATIC.out.vcf_filtered // channel: [ [ meta ], vcf ]
     vcf_somatic  = GRIPSS_SOMATIC.out.vcf_somatic // channel: [ [ meta ], vcf ]

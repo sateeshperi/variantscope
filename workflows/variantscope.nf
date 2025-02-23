@@ -55,7 +55,7 @@ workflow VARIANTSCOPE {
                         }
                     }
                     .filter { it != null }
-/*
+
     // SV calling Subworkflow
     BAM_VCF_SV_CALLING(
         ch_bam,
@@ -69,7 +69,7 @@ workflow VARIANTSCOPE {
     )
 
     ch_gripps_filtered_vcf = BAM_VCF_SV_CALLING.out.vcf_filtered
-*/
+
     // CNV calling Subworkflow
     CNV_CALLING(
         ch_bam,
@@ -79,8 +79,8 @@ workflow VARIANTSCOPE {
         ch_genome_version,
         ch_amber_germline_sites,
         ch_gc_profile,
-        ch_ensembl_path
-//        ch_gripps_filtered_vcf
+        ch_ensembl_path,
+        ch_gripps_filtered_vcf
     )
 
     //

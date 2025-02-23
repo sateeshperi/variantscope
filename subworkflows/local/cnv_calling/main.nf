@@ -13,7 +13,7 @@ workflow CNV_CALLING {
     ch_amber_germline_sites
     ch_gc_profile
     ch_ensembl_path
-    //gripps_filtered_vcf
+    gripps_filtered_vcf
 
     main:
 
@@ -32,7 +32,7 @@ workflow CNV_CALLING {
         ch_gc_profile
     )
     ch_versions = ch_versions.mix(COBALT.out.versions.first())
-/*
+
     // PURPLE
     ch_purple_input = Channel.empty()
             .mix(ch_bam)
@@ -60,8 +60,8 @@ workflow CNV_CALLING {
         ch_gc_profile,
         ch_ensembl_path
     )
-*/
-    // ch_versions = ch_versions.mix(PURPLE.out.versions.first())
+
+    ch_versions = ch_versions.mix(PURPLE.out.versions.first())
 
     emit:
     versions = ch_versions                     // channel: [ versions.yml ]
