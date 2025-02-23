@@ -39,14 +39,13 @@ process SVABA {
     task.ext.when == null || task.ext.when
 
     script:
-    def args    = task.ext.args ?: ''
+    //def args    = task.ext.args ?: ''
     def prefix  = task.ext.prefix ?: "${meta.id}"
     def bamlist = normalbam ? "-t ${tumorbam} -n ${normalbam}" : "-t ${tumorbam}"
     def dbsnp   = dbsnp ? "--dbsnp-vcf ${dbsnp}" : ""
     def regions = regions ? "--region ${regions}" : ""
-    def bwa     = bwa_index ? "cp -s ${bwa_index}/* ." : ""
+    //def bwa     = bwa_index ? "cp -s ${bwa_index}/* ." : ""
     """
-    ${bwa}
 
     svaba \\
         run \\
@@ -54,10 +53,9 @@ process SVABA {
         --threads ${task.cpus} \\
         ${dbsnp} \\
         --id-string ${meta.id} \\
-        --reference-genome ${fasta} \\
+        --reference-genome ${genome} \\
         --g-zip \\
-        ${regions} \\
-        ${args}
+        ${regions} 
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
