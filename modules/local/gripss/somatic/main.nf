@@ -20,13 +20,12 @@ process GRIPSS_SOMATIC {
     path 'versions.yml'                                                                    , emit: versions
 
     script:
-    def args          = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
     def reference_arg = meta.containsKey('normal_id') ? "-reference ${meta.normal_id}" : ''
     def output_id_arg = meta.containsKey('normal_id') ? '-output_id somatic' : ''
     """
     gripss \\
         -Xmx${Math.round(task.memory.bytes * 0.95)} \\
-        ${args} \\
         -sample ${meta.tumor_id} \\
         ${reference_arg} \\
         -vcf ${gridss_vcf} \\
