@@ -14,9 +14,9 @@ process PURPLE {
         path(normalbam), 
         path(normalbai),
         path(gripps_filtered_vcf), 
-        path(gripps_filtered_vcf_tbi)
-    path amber
-    path cobalt
+        path(gripps_filtered_vcf_tbi),
+        path(amber),
+        path(cobalt)
     val version
     path genome
     path genome_fai
