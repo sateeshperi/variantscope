@@ -24,6 +24,7 @@ process AMBER {
     def args = task.ext.args ?: ''
     """
     amber \\
+        -Xmx${Math.round(task.memory.bytes * 0.95)} \\
         -reference ${meta.normal_id} \\
         -reference_bam ${normalbam} \\
         -tumor ${meta.tumor_id} \\
