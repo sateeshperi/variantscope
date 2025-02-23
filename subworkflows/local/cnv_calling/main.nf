@@ -33,26 +33,14 @@ workflow CNV_CALLING {
     )
     ch_versions = ch_versions.mix(COBALT.out.versions.first())
 
-    // PURPLE
-    ch_purple_input = Channel.empty()
-            .mix(ch_bam)
-            .combine(gripps_filtered_vcf, by: [0])
-            .map { bam_meta, bam_paths, vcf_paths ->
-                [
-                bam_meta,            // meta map
-                bam_paths[1],        // tumorbam
-                bam_paths[2],        // tumorbai
-                bam_paths[3],        // normalbam
-                bam_paths[4],        // normalbai
-                vcf_paths[1],        // gripps_filtered_vcf
-                vcf_paths[2]         // gripps_filtered_vcf_tbi
-                ]
-            }
+
+    ch_purple_input = ch_bam
+        .combine(gripps_filtered_vcf, by: [0])
+        .combine(AMBER.out.amber_dir, by: [0])
+        .combine(COBALT.out.cobalt_dir, by: [0])
 
     PURPLE(
-        ch_purple_input
-        .combine(AMBER.out.amber_dir, by: [0])
-        .combine(COBALT.out.cobalt_dir, by: [0]),
+        ch_purple_input,
         ch_genome_version,
         ch_genome,
         ch_genome_fai,
