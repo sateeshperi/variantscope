@@ -13,7 +13,7 @@ workflow CNV_CALLING {
     ch_amber_germline_sites
     ch_gc_profile
     ch_ensembl_path
-    gripps_filtered_vcf
+    //gripps_filtered_vcf
 
     main:
 
