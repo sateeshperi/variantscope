@@ -14,7 +14,7 @@ process AMBER {
 
 
     output:
-    tuple val(meta), path('amber/'), emit: amber_dir
+    tuple val(meta), path("amber/${meta.tumor_id}"), emit: amber_dir
     path 'versions.yml'            , emit: versions
 
     when:
@@ -29,7 +29,7 @@ process AMBER {
         -reference_bam ${normalbam} \\
         -tumor ${meta.tumor_id} \\
         -tumor_bam ${tumorbam} \\
-        -output_dir amber/ \\
+        -output_dir amber/${meta.tumor_id}/ \\
         -threads ${task.cpus} \\
         -loci ${amber_germline_sites} \\
         -ref_genome_version ${version}
@@ -42,7 +42,7 @@ process AMBER {
 
     stub:
     """
-    mkdir -p amber/
+    mkdir -p amber/${meta.tumor_id}/
     touch amber/placeholder
 
     cat <<-END_VERSIONS > versions.yml

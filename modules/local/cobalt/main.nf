@@ -12,7 +12,7 @@ process COBALT {
     path gc_profile
 
     output:
-    tuple val(meta), path('cobalt/'), emit: cobalt_dir
+    tuple val(meta), path("cobalt/${meta.tumor_id}"), emit: cobalt_dir
     path 'versions.yml'             , emit: versions
 
     when:
@@ -29,7 +29,7 @@ process COBALT {
         -tumor_bam ${tumorbam} \\
         -threads ${task.cpus} \\
         -gc_profile ${gc_profile} \\
-        -output_dir cobalt/
+        -output_dir cobalt/${meta.tumor_id}/
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -39,7 +39,7 @@ process COBALT {
 
     stub:
     """
-    mkdir -p cobalt/
+    mkdir -p cobalt/${meta.tumor_id}
     touch cobalt/placeholder
 
     cat <<-END_VERSIONS > versions.yml
