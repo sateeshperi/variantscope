@@ -15,8 +15,8 @@ process GRIPSS_SOMATIC {
     path genome_dict
 
     output:
-    tuple val(meta), path('*.gripss.filtered.vcf.gz'), path('*.gripss.filtered.vcf.gz.tbi'), emit: vcf_filtered
-    tuple val(meta), path('*.gripss.somatic.vcf.gz'), path('*.gripss.somatic.vcf.gz.tbi')  , emit: vcf_somatic
+    tuple val(meta), path("${meta.tumor_id}.gripss.filtered.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.filtered.somatic.vcf.gz.tbi"), emit: vcf_filtered
+    tuple val(meta), path("${meta.tumor_id}.gripss.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.somatic.vcf.gz.tbi")  , emit: vcf_somatic
     path 'versions.yml'                                                                    , emit: versions
 
     script:
@@ -45,8 +45,8 @@ process GRIPSS_SOMATIC {
     """
     touch ${meta.tumor_id}.gripss.somatic.vcf.gz
     touch ${meta.tumor_id}.gripss.somatic.vcf.gz.tbi
-    touch ${meta.tumor_id}.gripss.filtered.vcf.gz
-    touch ${meta.tumor_id}.gripss.filtered.vcf.gz.tbi
+    touch ${meta.tumor_id}.gripss.filtered.somatic.vcf.gz
+    touch ${meta.tumor_id}.gripss.filtered.somatic.vcf.gz.tbi
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
