@@ -46,7 +46,7 @@ workflow BAM_VCF_SV_CALLING {
         ch_genome_fai,
         ch_genome_dict
     )
-*/
+
     // SVABA
     SVABA(
         ch_bam,
@@ -58,7 +58,7 @@ workflow BAM_VCF_SV_CALLING {
         ch_regions,
         ch_bwa_index
     )
-
+*/
     ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
 
     emit:
