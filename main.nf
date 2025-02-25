@@ -33,6 +33,11 @@ ch_amber_germline_sites = params.amber_germline_sites ?: "${projectDir}/assets/r
 ch_gc_profile           = params.gc_profile           ?: "${projectDir}/assets/references/GC_profile.1000bp.38.cnp"
 ch_ensembl_path         = params.ensembl_path         ?: "${projectDir}/assets/references/ensembl"
 ch_bwa_index            = params.bwa_index            ?: "${projectDir}/assets/references"
+ch_unmap_regions        = params.unmap_regions        ?: "${projectDir}/assets/references/unmap_regions.38.tsv"
+ch_known_fusion         = params.known_fusion         ?: "${projectDir}/assets/references/known_fusions.txt"
+//ch_ensembl_data         = params.ensembl_data         ?: "${projectDir}/assets/references/ensembl_data"
+ch_driver_genes         = params.driver_genes         ?: "${projectDir}/assets/references/driver_genes.txt"
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
@@ -64,7 +69,9 @@ workflow SOWPATILAB_VARIANTSCOPE {
         ch_amber_germline_sites,
         ch_gc_profile,    
         ch_ensembl_path,
-        ch_bwa_index
+        ch_bwa_index,
+        ch_driver_genes,
+        ch_known_fusion
     )
 }
 /*
