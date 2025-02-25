@@ -32,7 +32,7 @@ ch_regions              = params.regions              ?: "${projectDir}/assets/r
 ch_amber_germline_sites = params.amber_germline_sites ?: "${projectDir}/assets/references/AmberGermlineSites.38.tsv.gz"
 ch_gc_profile           = params.gc_profile           ?: "${projectDir}/assets/references/GC_profile.1000bp.38.cnp"
 ch_ensembl_path         = params.ensembl_path         ?: "${projectDir}/assets/references/ensembl"
-
+ch_bwa_index            = params.bwa_index            ?: "${projectDir}/assets/references"
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
@@ -63,7 +63,8 @@ workflow SOWPATILAB_VARIANTSCOPE {
         ch_regions,
         ch_amber_germline_sites,
         ch_gc_profile,    
-        ch_ensembl_path
+        ch_ensembl_path,
+        ch_bwa_index
     )
 }
 /*

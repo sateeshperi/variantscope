@@ -29,6 +29,7 @@ workflow VARIANTSCOPE {
     ch_amber_germline_sites
     ch_gc_profile        
     ch_ensembl_path
+    ch_bwa_index
 
     main:
 
@@ -65,7 +66,8 @@ workflow VARIANTSCOPE {
         ch_genome_version,
         ch_dbsnp,     
         ch_dbsnp_tbi,
-        ch_regions
+        ch_regions,
+        ch_bwa_index
     )
 
     ch_gripps_filtered_vcf = BAM_VCF_SV_CALLING.out.vcf_filtered

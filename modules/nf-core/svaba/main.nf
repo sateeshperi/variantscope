@@ -1,7 +1,7 @@
 
 process SVABA {
     tag "${meta.id}"
-    label 'process_single'
+    label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -16,6 +16,7 @@ process SVABA {
     path dbsnp
     path dbsnp_tbi
     path regions
+    path bwa_index
 
     output:
     tuple val(meta), path("*.svaba.sv.vcf.gz")                        , emit: sv, optional: true
@@ -43,9 +44,10 @@ process SVABA {
     def prefix  = task.ext.prefix ?: "${meta.id}"
     def bamlist = normalbam ? "-t ${tumorbam} -n ${normalbam}" : "-t ${tumorbam}"
     def dbsnp   = dbsnp ? "--dbsnp-vcf ${dbsnp}" : ""
-    def regions = regions ? "--region ${regions}" : ""
-    //def bwa     = bwa_index ? "cp -s ${bwa_index}/* ." : ""
+    //def regions = regions ? "--region ${regions}" : ""
+    def bwa     = bwa_index ? "cp -s ${bwa_index}/*38* ." : ""
     """
+    ${bwa}
 
     svaba \\
         run \\
@@ -54,8 +56,8 @@ process SVABA {
         ${dbsnp} \\
         --id-string ${meta.id} \\
         --reference-genome ${genome} \\
-        --g-zip \\
-        ${regions} 
+        --g-zip 
+        #${regions} 
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

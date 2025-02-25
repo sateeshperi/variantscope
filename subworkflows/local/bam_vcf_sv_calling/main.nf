@@ -14,6 +14,7 @@ workflow BAM_VCF_SV_CALLING {
     ch_dbsnp
     ch_dbsnp_tbi
     ch_regions
+    ch_bwa_index
 
     main:
 
@@ -54,7 +55,8 @@ workflow BAM_VCF_SV_CALLING {
         ch_genome_dict,
         ch_dbsnp,
         ch_dbsnp_tbi,
-        ch_regions
+        ch_regions,
+        ch_bwa_index
     )
 
     ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
