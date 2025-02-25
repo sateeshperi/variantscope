@@ -1,6 +1,8 @@
 include { AMBER  } from '../../../modules/local/amber/main'
 include { COBALT } from '../../../modules/local/cobalt/main'
 include { PURPLE } from '../../../modules/local/purple/main'
+include { LINX_SOMATIC } from '../../../modules/local/linx/linx_somatic/main'
+include { LINX_VISUALISER } from '../../../modules/local/linx/visualizer/main'
 
 workflow CNV_CALLING {
 
@@ -14,6 +16,8 @@ workflow CNV_CALLING {
     ch_gc_profile
     ch_ensembl_path
     gripps_filtered_vcf
+    known_fusion
+    driver_genes
 
     main:
 
@@ -50,6 +54,24 @@ workflow CNV_CALLING {
     )
 
     ch_versions = ch_versions.mix(PURPLE.out.versions.first())
+
+    LINX_SOMATIC(
+        PURPLE.out.purple_dir,
+        ch_genome_version,
+        ch_ensembl_path,
+        known_fusion,
+        driver_genes
+    )
+
+    ch_versions = ch_versions.mix(LINX_SOMATIC.out.versions.first())
+
+    LINX_VISUALISER(
+        LINX_SOMATIC.out.annotation_dir,
+        ch_genome_version,
+        ch_ensembl_path
+    )
+
+    
 
     emit:
     versions = ch_versions                     // channel: [ versions.yml ]

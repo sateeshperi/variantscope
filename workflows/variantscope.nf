@@ -30,6 +30,8 @@ workflow VARIANTSCOPE {
     ch_gc_profile        
     ch_ensembl_path
     ch_bwa_index
+    ch_driver_genes
+    ch_known_fusion
 
     main:
 
@@ -82,7 +84,9 @@ workflow VARIANTSCOPE {
         ch_amber_germline_sites,
         ch_gc_profile,
         ch_ensembl_path,
-        ch_gripps_filtered_vcf
+        ch_gripps_filtered_vcf,
+        ch_known_fusion,
+        ch_driver_genes
     )
 
     //
