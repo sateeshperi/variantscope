@@ -36,7 +36,7 @@ process GRIPSS_SOMATIC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gripss: \$(gripss --version)
+        gripss: "2.4"
     END_VERSIONS
     """
 
@@ -50,7 +50,7 @@ process GRIPSS_SOMATIC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gripss: \$(gripss --version)
+        gripss: "2.4"
     END_VERSIONS
     """
 }

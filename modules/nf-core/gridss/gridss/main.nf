@@ -18,8 +18,8 @@ process GRIDSS {
     path "versions.yml"                            , emit: versions
 
     script:
-    def args    = task.ext.args ?: ''
-    def prefix  = task.ext.prefix ?: "${meta.id}"
+    def args   = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
     """
     gridss \\
         --reference ${genome} \\
@@ -31,7 +31,7 @@ process GRIDSS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gridss: "\$(gridss --version 2>&1 | sed 's/^.*GRIDSS version: //; s/ .*\$//')"
+        gridss: "2.13.2"
     END_VERSIONS
     """
 
@@ -42,7 +42,7 @@ process GRIDSS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gridss: "\$(gridss --version 2>&1 | sed 's/^.*GRIDSS version: //; s/ .*\$//')"
+        gridss: "2.13.2"
     END_VERSIONS
     """
 }

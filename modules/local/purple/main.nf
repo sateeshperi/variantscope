@@ -42,7 +42,7 @@ process PURPLE {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        purple: \$(purple -version | sed 's/^.* //')
+        purple: "\$(purple -version | sed 's/^.* //')"
     END_VERSIONS
     """
 
@@ -52,7 +52,7 @@ process PURPLE {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        purple: \$(purple -version | sed 's/^.* //')
+        purple: "\$(purple -version | sed 's/^.* //')"
     END_VERSIONS
     """
 }

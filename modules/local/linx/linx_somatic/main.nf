@@ -40,7 +40,7 @@ process LINX_SOMATIC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        linx: \$(linx -version | sed 's/^.* //')
+        linx: "\$(linx -version | sed 's/^.* //')"
     END_VERSIONS
     """
 
@@ -49,6 +49,9 @@ process LINX_SOMATIC {
     mkdir linx_somatic/
     touch linx_somatic/placeholder
 
-    echo -e '${task.process}:\\n  stub: noversions\\n' > versions.yml
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        linx: "\$(linx -version | sed 's/^.* //')"
+    END_VERSIONS
     """
 }

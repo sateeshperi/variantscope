@@ -36,7 +36,7 @@ process AMBER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        amber: \$(amber -version | sed 's/^.* //')
+        amber: "\$(amber -version | sed 's/^.* //')"
     END_VERSIONS
     """
 
@@ -47,7 +47,7 @@ process AMBER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        amber: \$(amber -version | sed 's/^.* //')
+        amber: "\$(amber -version | sed 's/^.* //')"
     END_VERSIONS
     """
 }

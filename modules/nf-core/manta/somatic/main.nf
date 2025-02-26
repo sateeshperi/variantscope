@@ -26,8 +26,8 @@ process MANTA_SOMATIC {
     path "versions.yml"                                          , emit: versions
 
     script:
-    def args          = task.ext.args   ?: ''
-    def prefix        = task.ext.prefix ?: "${meta.id}"
+    def args   = task.ext.args   ?: ''
+    def prefix = task.ext.prefix ?: "${meta.id}"
     """
     configManta.py \\
         --tumorBam ${tumorbam} \\
@@ -56,7 +56,7 @@ process MANTA_SOMATIC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        manta: \$(configManta.py --version)
+        manta: "\$(configManta.py --version)"
     END_VERSIONS
     """
 
@@ -74,7 +74,7 @@ process MANTA_SOMATIC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        manta: \$(configManta.py --version)
+        manta: "\$(configManta.py --version)"
     END_VERSIONS
     """
 }

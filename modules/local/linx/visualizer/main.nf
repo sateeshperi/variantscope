@@ -42,7 +42,7 @@ process LINX_VISUALISER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        linx: \$(linx -version | sed 's/^.* //')
+        linx: "\$(linx -version | sed 's/^.* //')"
     END_VERSIONS
     """
 
@@ -53,7 +53,7 @@ process LINX_VISUALISER {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        linx: \$(linx -version | sed 's/^.* //')
+        linx: "\$(linx -version | sed 's/^.* //')"
     END_VERSIONS
     """
 }
