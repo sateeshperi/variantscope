@@ -74,7 +74,7 @@ process MANTA_SOMATIC {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        manta: "\$(configManta.py --version)"
+        manta: "\$(configManta.py 2>&1  |grep -E '^Version:'|sed 's/Version: //')"
     END_VERSIONS
     """
 }
