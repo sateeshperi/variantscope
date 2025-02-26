@@ -54,14 +54,14 @@ workflow BAM_VCF_SV_CALLING {
     ch_versions = ch_versions.mix(SVABA.out.versions)
 
     // MANTA
-    // MANTA_SOMATIC(
-    //     ch_bam,
-    //     ch_genome,
-    //     ch_genome_fai,
-    //     ch_genome_dict
-    // )
+    MANTA_SOMATIC(
+        ch_bam,
+        ch_genome,
+        ch_genome_fai,
+        ch_genome_dict
+    )
 
-    // ch_versions = ch_versions.mix(MANTA_SOMATIC.out.versions)
+    ch_versions = ch_versions.mix(MANTA_SOMATIC.out.versions)
 
     emit:
     vcf_filtered = GRIPSS_SOMATIC.out.vcf_filtered // channel: [ [ meta ], vcf ]
