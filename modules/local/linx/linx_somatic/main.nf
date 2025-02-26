@@ -22,8 +22,7 @@ process LINX_SOMATIC {
     task.ext.when == null || task.ext.when
 
     script:
-    //def args = task.ext.args ?: ''
-
+    def args = task.ext.args ?: ''
     """
     linx \\
         -Xmx${Math.round(task.memory.bytes * 0.95)} \\

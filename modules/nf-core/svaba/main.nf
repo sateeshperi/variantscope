@@ -14,7 +14,6 @@ process SVABA {
     path genome_fai
     path genome_dict
     path dbsnp
-    path dbsnp_tbi
     path regions
     path bwa_index
 
@@ -40,11 +39,10 @@ process SVABA {
     task.ext.when == null || task.ext.when
 
     script:
-    //def args    = task.ext.args ?: ''
+    def args    = task.ext.args ?: ''
     def prefix  = task.ext.prefix ?: "${meta.id}"
     def bamlist = normalbam ? "-t ${tumorbam} -n ${normalbam}" : "-t ${tumorbam}"
     def dbsnp   = dbsnp ? "--dbsnp-vcf ${dbsnp}" : ""
-    //def regions = regions ? "--region ${regions}" : ""
     def bwa     = bwa_index ? "cp -s ${bwa_index}/*38* ." : ""
     """
     ${bwa}
@@ -56,14 +54,14 @@ process SVABA {
         ${dbsnp} \\
         --id-string ${meta.id} \\
         --reference-genome ${genome} \\
-        --g-zip 
-        #${regions} 
+        --g-zip
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         svaba: \$(echo \$(svaba --version 2>&1) | sed 's/[^0-9.]*\\([0-9.]*\\).*/\\1/' )
     END_VERSIONS
     """
+
     stub:
     prefix = task.ext.prefix ?: "${meta.id}"
     """

@@ -8,6 +8,7 @@ include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pi
 include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_variantscope_pipeline'
 include { BAM_VCF_SV_CALLING     } from '../subworkflows/local/bam_vcf_sv_calling/main'
 include { CNV_CALLING            } from '../subworkflows/local/cnv_calling/main'
+include { SV_EVENT_CALLING       } from '../subworkflows/local/sv_event_calling/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,7 +25,6 @@ workflow VARIANTSCOPE {
     ch_genome_dict
     ch_genome_version
     ch_dbsnp
-    ch_dbsnp_tbi
     ch_regions
     ch_amber_germline_sites
     ch_gc_profile        
@@ -66,13 +66,13 @@ workflow VARIANTSCOPE {
         ch_genome_fai,
         ch_genome_dict,
         ch_genome_version,
-        ch_dbsnp,     
-        ch_dbsnp_tbi,
+        ch_dbsnp,
         ch_regions,
         ch_bwa_index
     )
 
     ch_gripps_filtered_vcf = BAM_VCF_SV_CALLING.out.vcf_filtered
+    ch_versions            = ch_versions.mix(BAM_VCF_SV_CALLING.out.versions.first())
 
     // CNV calling Subworkflow
     CNV_CALLING(
@@ -88,6 +88,19 @@ workflow VARIANTSCOPE {
         ch_known_fusion,
         ch_driver_genes
     )
+
+    ch_versions = ch_versions.mix(CNV_CALLING.out.versions.first())
+
+    // SV Event calling Subworkflow
+    SV_EVENT_CALLING(
+        CNV_CALLING.out.purple_dir,
+        ch_genome_version,
+        ch_ensembl_path,
+        ch_known_fusion,
+        ch_driver_genes
+    )
+
+    ch_versions = ch_versions.mix(SV_EVENT_CALLING.out.versions.first())
 
     //
     // Collate and save software versions

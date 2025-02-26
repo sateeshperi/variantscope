@@ -31,7 +31,7 @@ process GRIDSS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gridss: \$(gridss --version 2>&1 | sed 's/^.*GRIDSS version: //; s/ .*\$//')
+        gridss: "\$(gridss --version 2>&1 | sed 's/^.*GRIDSS version: //; s/ .*\$//')"
     END_VERSIONS
     """
 
@@ -42,7 +42,7 @@ process GRIDSS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        gridss: \$(gridss --version 2>&1 | sed 's/^.*GRIDSS version: //; s/ .*\$//')
+        gridss: "\$(gridss --version 2>&1 | sed 's/^.*GRIDSS version: //; s/ .*\$//')"
     END_VERSIONS
     """
 }

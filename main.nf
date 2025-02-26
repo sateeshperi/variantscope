@@ -27,7 +27,6 @@ ch_genome_fai           = params.genome_fai           ?: "${projectDir}/assets/r
 ch_genome_dict          = params.genome_dict          ?: "${projectDir}/assets/references/hg38.dict"
 ch_genome_version       = params.genome_version       ?: '38'
 ch_dbsnp                = params.dbsnp                ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz"
-ch_dbsnp_tbi            = params.dbsnp_tbi            ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz.tbi"
 ch_regions              = params.regions              ?: "${projectDir}/assets/references/regions.bed"
 ch_amber_germline_sites = params.amber_germline_sites ?: "${projectDir}/assets/references/AmberGermlineSites.38.tsv.gz"
 ch_gc_profile           = params.gc_profile           ?: "${projectDir}/assets/references/GC_profile.1000bp.38.cnp"
@@ -35,7 +34,7 @@ ch_ensembl_path         = params.ensembl_path         ?: "${projectDir}/assets/r
 ch_bwa_index            = params.bwa_index            ?: "${projectDir}/assets/references"
 ch_unmap_regions        = params.unmap_regions        ?: "${projectDir}/assets/references/unmap_regions.38.tsv"
 ch_known_fusion         = params.known_fusion         ?: "${projectDir}/assets/references/known_fusions.txt"
-//ch_ensembl_data         = params.ensembl_data         ?: "${projectDir}/assets/references/ensembl_data"
+ch_ensembl_data         = params.ensembl_data         ?: "${projectDir}/assets/references/ensembl_data"
 ch_driver_genes         = params.driver_genes         ?: "${projectDir}/assets/references/driver_genes.txt"
 
 /*
@@ -63,8 +62,7 @@ workflow SOWPATILAB_VARIANTSCOPE {
         ch_genome_fai,
         ch_genome_dict,
         ch_genome_version,
-        ch_dbsnp,     
-        ch_dbsnp_tbi,
+        ch_dbsnp,
         ch_regions,
         ch_amber_germline_sites,
         ch_gc_profile,    

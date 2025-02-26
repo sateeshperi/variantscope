@@ -85,10 +85,6 @@ input:
           Groovy Map containing dbSNP information
           id: should be the identification number for dbSNP files
           e.g. [ id:'test' ]
-    - dbsnp_tbi:
-        type: file
-        description: Index of VCF file including dbSNP variants
-        pattern: "*.vcf.gz.tbi"
   - - meta5:
         type: map
         description: |
