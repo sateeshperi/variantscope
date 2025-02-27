@@ -55,6 +55,8 @@ workflow VARIANTSCOPE {
                                 file(normal.filepath),  // normal bam
                                 file(normal.indexpath)  // normal bai
                             ]
+                        } else {
+                            error "Subject ID ${subject_id} does not have both 'tumor' and 'normal' sample types. Please fix the input samplesheet"
                         }
                     }
                     .filter { it != null }

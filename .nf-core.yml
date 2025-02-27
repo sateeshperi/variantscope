@@ -106,9 +106,9 @@ lint:
 template:
   org: SowpatiLab
   name: variantscope
-  description: somaticstructural variant scoping
+  description: Somatic Structural Variant Scoping
   author: Isha Choubey
-  version: 1.0.0dev
+  version: 0.1.0
   force: true
   outdir: .
   skip_features:

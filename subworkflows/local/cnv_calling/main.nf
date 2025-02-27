@@ -40,9 +40,9 @@ workflow CNV_CALLING {
 
     // PURPLE
     ch_purple_input = ch_bam
-                        .combine(gripps_filtered_vcf, by: [0])
-                        .combine(AMBER.out.amber_dir, by: [0])
-                        .combine(COBALT.out.cobalt_dir, by: [0])
+                        .combine(gripps_filtered_vcf, by: 0)
+                        .combine(AMBER.out.amber_dir, by: 0)
+                        .combine(COBALT.out.cobalt_dir, by: 0)
 
     PURPLE(
         ch_purple_input,

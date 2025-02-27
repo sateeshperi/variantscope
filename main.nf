@@ -22,20 +22,21 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_vari
     GENOME PARAMETER VALUES
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-ch_genome               = params.genome               ?: "${projectDir}/assets/references/hg38.fa"
-ch_genome_fai           = params.genome_fai           ?: "${projectDir}/assets/references/hg38.fa.fai"
-ch_genome_dict          = params.genome_dict          ?: "${projectDir}/assets/references/hg38.dict"
-ch_genome_version       = params.genome_version       ?: '38'
-ch_dbsnp                = params.dbsnp                ?: "${projectDir}/assets/references/dbsnp_138.hg38.vcf.gz"
-ch_regions              = params.regions              ?: "${projectDir}/assets/references/regions.bed"
-ch_amber_germline_sites = params.amber_germline_sites ?: "${projectDir}/assets/references/AmberGermlineSites.38.tsv.gz"
-ch_gc_profile           = params.gc_profile           ?: "${projectDir}/assets/references/GC_profile.1000bp.38.cnp"
-ch_ensembl_path         = params.ensembl_path         ?: "${projectDir}/assets/references/ensembl"
-ch_bwa_index            = params.bwa_index            ?: "${projectDir}/assets/references"
-ch_unmap_regions        = params.unmap_regions        ?: "${projectDir}/assets/references/unmap_regions.38.tsv"
-ch_known_fusion         = params.known_fusion         ?: "${projectDir}/assets/references/known_fusions.txt"
-ch_ensembl_data         = params.ensembl_data         ?: "${projectDir}/assets/references/ensembl_data"
-ch_driver_genes         = params.driver_genes         ?: "${projectDir}/assets/references/driver_genes.txt"
+
+ch_genome               = params.genome               ? Channel.of(file(params.genome, checkIfExists: true))               : Channel.empty()
+ch_genome_fai           = params.genome_fai           ? Channel.of(file(params.genome_fai, checkIfExists: true))           : Channel.empty()
+ch_genome_dict          = params.genome_dict          ? Channel.of(file(params.genome_dict, checkIfExists: true))          : Channel.empty()
+ch_genome_version       = params.genome_version       ? Channel.value(params.genome_version)                               : Channel.empty()
+ch_dbsnp                = params.dbsnp                ? Channel.of(file(params.dbsnp, checkIfExists: true))                : Channel.empty()
+ch_regions              = params.regions              ? Channel.of(file(params.regions, checkIfExists: true))              : Channel.empty()
+ch_amber_germline_sites = params.amber_germline_sites ? Channel.of(file(params.amber_germline_sites, checkIfExists: true)) : Channel.empty()
+ch_gc_profile           = params.gc_profile           ? Channel.of(file(params.gc_profile, checkIfExists: true))           : Channel.empty()
+ch_ensembl_path         = params.ensembl_path         ? Channel.of(file(params.ensembl_path, checkIfExists: true))         : Channel.empty()
+ch_bwa_index            = params.bwa_index            ? Channel.of(file(params.bwa_index, checkIfExists: true))            : Channel.empty()
+ch_unmap_regions        = params.unmap_regions        ? Channel.of(file(params.unmap_regions, checkIfExists: true))        : Channel.empty()
+ch_known_fusion         = params.known_fusion         ? Channel.of(file(params.known_fusion, checkIfExists: true))         : Channel.empty()
+ch_ensembl_data         = params.ensembl_data         ? Channel.of(file(params.ensembl_data, checkIfExists: true))         : Channel.empty()
+ch_driver_genes         = params.driver_genes         ? Channel.of(file(params.driver_genes, checkIfExists: true))         : Channel.empty()
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

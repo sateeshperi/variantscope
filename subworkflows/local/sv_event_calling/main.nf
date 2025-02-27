@@ -1,14 +1,14 @@
-include { LINX_SOMATIC    } from '../../../modules/local/linx/linx_somatic/main'
+include { LINX_SOMATIC    } from '../../../modules/local/linx/somatic/main'
 include { LINX_VISUALISER } from '../../../modules/local/linx/visualizer/main'
 
 workflow SV_EVENT_CALLING {
 
     take:
-    purple_dir
+    ch_purple_dir
     ch_genome_version
     ch_ensembl_path
-    known_fusion
-    driver_genes
+    ch_known_fusion
+    ch_driver_genes
 
     main:
 
@@ -16,11 +16,11 @@ workflow SV_EVENT_CALLING {
 
     // LINX_SOMATIC
     LINX_SOMATIC(
-        purple_dir,
+        ch_purple_dir,
         ch_genome_version,
         ch_ensembl_path,
-        known_fusion,
-        driver_genes
+        ch_known_fusion,
+        ch_driver_genes
     )
 
     ch_versions = ch_versions.mix(LINX_SOMATIC.out.versions.first())
