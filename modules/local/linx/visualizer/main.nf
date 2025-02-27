@@ -16,10 +16,8 @@ process LINX_VISUALISER {
     tuple val(meta), path('plots/'), emit: plots
     path 'versions.yml'            , emit: versions
 
-    when:
-    task.ext.when == null || task.ext.when
-
     script:
+    def args = task.ext.args ?: ''
     """
     mkdir -p plots/
 

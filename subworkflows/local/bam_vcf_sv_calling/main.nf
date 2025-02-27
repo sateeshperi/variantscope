@@ -27,7 +27,7 @@ workflow BAM_VCF_SV_CALLING {
         ch_genome_dict
     )
 
-    ch_versions = ch_versions.mix(GRIDSS.out.versions)
+    ch_versions = ch_versions.mix(GRIDSS.out.versions.first())
 
     // GRIPSS
     GRIPSS_SOMATIC(
@@ -38,7 +38,7 @@ workflow BAM_VCF_SV_CALLING {
         ch_genome_dict
     )
 
-    ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions)
+    ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
 
     // SVABA
     SVABA(
@@ -51,7 +51,7 @@ workflow BAM_VCF_SV_CALLING {
         ch_bwa_index
     )
 
-    ch_versions = ch_versions.mix(SVABA.out.versions)
+    ch_versions = ch_versions.mix(SVABA.out.versions.first())
 
     // MANTA
     MANTA_SOMATIC(
@@ -61,7 +61,7 @@ workflow BAM_VCF_SV_CALLING {
         ch_genome_dict
     )
 
-    ch_versions = ch_versions.mix(MANTA_SOMATIC.out.versions)
+    ch_versions = ch_versions.mix(MANTA_SOMATIC.out.versions.first())
 
     emit:
     vcf_filtered = GRIPSS_SOMATIC.out.vcf_filtered // channel: [ [ meta ], vcf ]

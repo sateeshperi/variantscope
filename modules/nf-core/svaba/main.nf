@@ -35,20 +35,16 @@ process SVABA {
     tuple val(meta), path("*.log")                                    , emit: log
     path "versions.yml"                                               , emit: versions
 
-    when:
-    task.ext.when == null || task.ext.when
-
     script:
-    def args    = task.ext.args ?: ''
+    def args    = task.ext.args   ?: ''
     def prefix  = task.ext.prefix ?: "${meta.id}"
-    def bamlist = normalbam ? "-t ${tumorbam} -n ${normalbam}" : "-t ${tumorbam}"
-    def dbsnp   = dbsnp ? "--dbsnp-vcf ${dbsnp}" : ""
-    def bwa     = bwa_index ? "cp -s ${bwa_index}/*38* ." : ""
+    def bamlist = normalbam       ? "-t ${tumorbam} -n ${normalbam}" : "-t ${tumorbam}"
+    def dbsnp   = dbsnp           ? "--dbsnp-vcf ${dbsnp}"           : ""
+    def bwa     = bwa_index       ? "cp -s ${bwa_index}/*38* ."      : ""
     """
     ${bwa}
 
-    svaba \\
-        run \\
+    svaba run \\
         ${bamlist} \\
         --threads ${task.cpus} \\
         ${dbsnp} \\

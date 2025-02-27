@@ -15,10 +15,7 @@ process AMBER {
 
     output:
     tuple val(meta), path("amber"), emit: amber_dir
-    path 'versions.yml'            , emit: versions
-
-    when:
-    task.ext.when == null || task.ext.when
+    path 'versions.yml'           , emit: versions
 
     script:
     def args = task.ext.args ?: ''

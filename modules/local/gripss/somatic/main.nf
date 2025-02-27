@@ -16,11 +16,12 @@ process GRIPSS_SOMATIC {
 
     output:
     tuple val(meta), path("${meta.tumor_id}.gripss.filtered.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.filtered.somatic.vcf.gz.tbi"), emit: vcf_filtered
-    tuple val(meta), path("${meta.tumor_id}.gripss.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.somatic.vcf.gz.tbi")  , emit: vcf_somatic
-    path 'versions.yml'                                                                    , emit: versions
+    tuple val(meta), path("${meta.tumor_id}.gripss.somatic.vcf.gz"), path("${meta.tumor_id}.gripss.somatic.vcf.gz.tbi")                  , emit: vcf_somatic
+    path 'versions.yml'                                                                                                                  , emit: versions
 
     script:
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    def args          = task.ext.args ?: ''
+    def prefix        = task.ext.prefix ?: "${meta.id}"
     def reference_arg = meta.containsKey('normal_id') ? "-reference ${meta.normal_id}" : ''
     def output_id_arg = meta.containsKey('normal_id') ? '-output_id somatic' : ''
     """

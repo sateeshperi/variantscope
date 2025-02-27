@@ -14,6 +14,7 @@ workflow SV_EVENT_CALLING {
 
     ch_versions = Channel.empty()
 
+    // LINX_SOMATIC
     LINX_SOMATIC(
         purple_dir,
         ch_genome_version,
@@ -24,6 +25,7 @@ workflow SV_EVENT_CALLING {
 
     ch_versions = ch_versions.mix(LINX_SOMATIC.out.versions.first())
 
+    // LINX_VISUALISER
     LINX_VISUALISER(
         LINX_SOMATIC.out.annotation_dir,
         ch_genome_version,
@@ -33,5 +35,6 @@ workflow SV_EVENT_CALLING {
     ch_versions = ch_versions.mix(LINX_VISUALISER.out.versions.first())
 
     emit:
-    versions = ch_versions                     // channel: [ versions.yml ]
+    linx_plots = LINX_VISUALISER.out.plots
+    versions   = ch_versions                     // channel: [ versions.yml ]
 }

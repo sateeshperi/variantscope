@@ -9,6 +9,10 @@ Initial release of SowpatiLab/variantscope, created with the [nf-core](https://n
 
 ### `Added`
 
+* SV callers - GRIDSS + GRIPSS Filter, MANTA, SVABA
+* CNV Callers - AMBER, COBALT, PURPLE
+* SV Event Interpretation - LINX 
+
 ### `Fixed`
 
 ### `Dependencies`

@@ -72,7 +72,7 @@ workflow VARIANTSCOPE {
     )
 
     ch_gripps_filtered_vcf = BAM_VCF_SV_CALLING.out.vcf_filtered
-    ch_versions            = ch_versions.mix(BAM_VCF_SV_CALLING.out.versions.first())
+    ch_versions            = ch_versions.mix(BAM_VCF_SV_CALLING.out.versions)
 
     // CNV calling Subworkflow
     CNV_CALLING(
@@ -89,7 +89,7 @@ workflow VARIANTSCOPE {
         ch_driver_genes
     )
 
-    ch_versions = ch_versions.mix(CNV_CALLING.out.versions.first())
+    ch_versions = ch_versions.mix(CNV_CALLING.out.versions)
 
     // SV Event calling Subworkflow
     SV_EVENT_CALLING(
@@ -100,7 +100,7 @@ workflow VARIANTSCOPE {
         ch_driver_genes
     )
 
-    ch_versions = ch_versions.mix(SV_EVENT_CALLING.out.versions.first())
+    ch_versions = ch_versions.mix(SV_EVENT_CALLING.out.versions)
 
     //
     // Collate and save software versions
@@ -115,7 +115,7 @@ workflow VARIANTSCOPE {
 
 
     emit:
-    versions       = ch_versions                 // channel: [ path(versions.yml) ]
+    versions = ch_versions                 // channel: [ path(versions.yml) ]
 }
 
 /*

@@ -1,6 +1,6 @@
-include { AMBER           } from '../../../modules/local/amber/main'
-include { COBALT          } from '../../../modules/local/cobalt/main'
-include { PURPLE          } from '../../../modules/local/purple/main'
+include { AMBER  } from '../../../modules/local/amber/main'
+include { COBALT } from '../../../modules/local/cobalt/main'
+include { PURPLE } from '../../../modules/local/purple/main'
 
 workflow CNV_CALLING {
 

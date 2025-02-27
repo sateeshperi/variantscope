@@ -18,9 +18,6 @@ process LINX_SOMATIC {
     tuple val(meta), path('linx_somatic/'), emit: annotation_dir
     path 'versions.yml'                   , emit: versions
 
-    when:
-    task.ext.when == null || task.ext.when
-
     script:
     def args = task.ext.args ?: ''
     """
