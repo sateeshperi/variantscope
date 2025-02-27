@@ -12,7 +12,7 @@ process LINX_SOMATIC {
     val genome_version
     path ensembl_path
     path known_fusion
-    path known_fusion
+    path driver_genes
 
     output:
     tuple val(meta), path('linx_somatic/'), emit: annotation_dir
@@ -29,7 +29,7 @@ process LINX_SOMATIC {
         -ref_genome_version ${genome_version} \\
         -ensembl_data_dir ${ensembl_path} \\
         -known_fusion_file ${known_fusion} \\
-        -driver_gene_panel ${known_fusion} \\
+        -driver_gene_panel ${driver_genes} \\
         -output_dir linx_somatic/ \\
         -threads ${task.cpus} \\
         -log_debug \\
