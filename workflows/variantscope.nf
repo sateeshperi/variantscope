@@ -86,9 +86,7 @@ workflow VARIANTSCOPE {
         ch_amber_germline_sites,
         ch_gc_profile,
         ch_ensembl_path,
-        ch_gripps_filtered_vcf,
-        ch_known_fusion,
-        ch_driver_genes
+        ch_gripps_filtered_vcf
     )
 
     ch_versions = ch_versions.mix(CNV_CALLING.out.versions)

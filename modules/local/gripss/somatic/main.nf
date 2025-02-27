@@ -1,5 +1,5 @@
 process GRIPSS_SOMATIC {
-    tag "$meta.id"
+    tag "${meta.id}"
     label 'process_low'
 
     conda "${moduleDir}/environment.yml"
@@ -20,7 +20,7 @@ process GRIPSS_SOMATIC {
     path 'versions.yml'                                                                                                                  , emit: versions
 
     script:
-    def args          = task.ext.args ?: ''
+    def args          = task.ext.args   ?: ''
     def prefix        = task.ext.prefix ?: "${meta.id}"
     def reference_arg = meta.containsKey('normal_id') ? "-reference ${meta.normal_id}" : ''
     def output_id_arg = meta.containsKey('normal_id') ? '-output_id somatic' : ''

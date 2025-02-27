@@ -12,7 +12,6 @@ process AMBER {
     val(version)
     path(amber_germline_sites)
 
-
     output:
     tuple val(meta), path("amber"), emit: amber_dir
     path 'versions.yml'           , emit: versions

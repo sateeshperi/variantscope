@@ -13,9 +13,7 @@ workflow CNV_CALLING {
     ch_amber_germline_sites
     ch_gc_profile
     ch_ensembl_path
-    gripps_filtered_vcf
-    known_fusion
-    driver_genes
+    ch_gripps_filtered_vcf
 
     main:
 
@@ -40,7 +38,7 @@ workflow CNV_CALLING {
 
     // PURPLE
     ch_purple_input = ch_bam
-                        .combine(gripps_filtered_vcf, by: 0)
+                        .combine(ch_gripps_filtered_vcf, by: 0)
                         .combine(AMBER.out.amber_dir, by: 0)
                         .combine(COBALT.out.cobalt_dir, by: 0)
 

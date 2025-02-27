@@ -1,5 +1,5 @@
 process MANTA_SOMATIC {
-    tag "$meta.id"
+    tag "${meta.id}"
     label 'process_very_high'
     label 'error_retry'
 
