@@ -23,6 +23,7 @@ include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_vari
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+/*
 ch_genome               = params.genome               ? Channel.of(file(params.genome, checkIfExists: true))               : Channel.empty()
 ch_genome_fai           = params.genome_fai           ? Channel.of(file(params.genome_fai, checkIfExists: true))           : Channel.empty()
 ch_genome_dict          = params.genome_dict          ? Channel.of(file(params.genome_dict, checkIfExists: true))          : Channel.empty()
@@ -37,7 +38,7 @@ ch_unmap_regions        = params.unmap_regions        ? Channel.of(file(params.u
 ch_known_fusion         = params.known_fusion         ? Channel.of(file(params.known_fusion, checkIfExists: true))         : Channel.empty()
 ch_ensembl_data         = params.ensembl_data         ? Channel.of(file(params.ensembl_data, checkIfExists: true))         : Channel.empty()
 ch_driver_genes         = params.driver_genes         ? Channel.of(file(params.driver_genes, checkIfExists: true))         : Channel.empty()
-
+*/
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     NAMED WORKFLOWS FOR PIPELINE
@@ -59,18 +60,18 @@ workflow SOWPATILAB_VARIANTSCOPE {
     //
     VARIANTSCOPE (
         samplesheet,
-        ch_genome,    
-        ch_genome_fai,
-        ch_genome_dict,
-        ch_genome_version,
-        ch_dbsnp,
-        ch_regions,
-        ch_amber_germline_sites,
-        ch_gc_profile,    
-        ch_ensembl_path,
-        ch_bwa_index,
-        ch_driver_genes,
-        ch_known_fusion
+        params.genome,
+        params.genome_fai,
+        params.genome_dict,
+        params.genome_version,
+        params.dbsnp,
+        params.regions,
+        params.amber_germline_sites,
+        params.gc_profile,
+        params.ensembl_path,
+        params.bwa_index,
+        params.driver_genes,
+        params.known_fusion
     )
 }
 /*
