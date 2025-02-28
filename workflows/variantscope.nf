@@ -24,14 +24,13 @@ workflow VARIANTSCOPE {
     ch_genome_fai
     ch_genome_dict
     ch_genome_version
-    ch_dbsnp
-    ch_regions
     ch_amber_germline_sites
     ch_gc_profile        
     ch_ensembl_path
     ch_bwa_index
-    ch_driver_genes
     ch_known_fusion
+    ch_driver_genes
+    ch_dbsnp
 
     main:
 
@@ -69,7 +68,6 @@ workflow VARIANTSCOPE {
         ch_genome_dict,
         ch_genome_version,
         ch_dbsnp,
-        ch_regions,
         ch_bwa_index
     )
 

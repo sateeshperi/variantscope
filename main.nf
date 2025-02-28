@@ -42,14 +42,13 @@ workflow SOWPATILAB_VARIANTSCOPE {
         params.genome_fai,
         params.genome_dict,
         params.genome_version,
-        params.dbsnp,
-        params.regions,
         params.amber_germline_sites,
         params.gc_profile,
         params.ensembl_path,
         params.bwa_index,
+        params.known_fusion,
         params.driver_genes,
-        params.known_fusion
+        params.dbsnp
     )
 }
 /*

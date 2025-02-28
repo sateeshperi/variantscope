@@ -11,9 +11,8 @@ workflow BAM_VCF_SV_CALLING {
     ch_genome_fai
     ch_genome_dict
     ch_genome_version
-    ch_dbsnp
-    ch_regions
     ch_bwa_index
+    ch_dbsnp
 
     main:
 
@@ -47,7 +46,6 @@ workflow BAM_VCF_SV_CALLING {
         ch_genome_fai,
         ch_genome_dict,
         ch_dbsnp,
-        ch_regions,
         ch_bwa_index
     )
 
