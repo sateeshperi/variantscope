@@ -67,12 +67,11 @@ workflow VARIANTSCOPE {
         ch_genome_fai,
         ch_genome_dict,
         ch_genome_version,
-        ch_dbsnp,
-        ch_bwa_index
+        ch_bwa_index,
+        ch_dbsnp
     )
 
-    ch_gripps_filtered_vcf = BAM_VCF_SV_CALLING.out.vcf_filtered
-    ch_versions            = ch_versions.mix(BAM_VCF_SV_CALLING.out.versions)
+    ch_versions = ch_versions.mix(BAM_VCF_SV_CALLING.out.versions)
 
     // CNV calling Subworkflow
     CNV_CALLING(
@@ -84,7 +83,7 @@ workflow VARIANTSCOPE {
         ch_amber_germline_sites,
         ch_gc_profile,
         ch_ensembl_path,
-        ch_gripps_filtered_vcf
+        BAM_VCF_SV_CALLING.out.vcf_filtered
     )
 
     ch_versions = ch_versions.mix(CNV_CALLING.out.versions)
