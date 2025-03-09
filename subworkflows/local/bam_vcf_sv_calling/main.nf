@@ -91,8 +91,8 @@ workflow BAM_VCF_SV_CALLING {
             }
         )
         .filter { _meta, t_bam, _t_bai, n_bam, _n_bai ->
-            t_bam.size() > 5242880 && n_bam.size() > 5242880 && ! t_bam.name.contains('decoy') && ! n_bam.name.contains('decoy')
-        } // Both BAMs should be greater than 5 MB otherwise MANTA generally fails
+            t_bam.size() > 1048576 && n_bam.size() > 1048576
+        } // Both BAMs should be greater than 1 MB otherwise MANTA generally fails
 
     MANTA_SOMATIC(
         ch_manta_somatic_input,
