@@ -4,6 +4,7 @@ include { SVABA } from '../../../modules/nf-core/svaba/main'
 
 include { SPLIT_BAM } from '../../../modules/local/split_bam/main'
 include { MANTA_SOMATIC } from '../../../modules/nf-core/manta/somatic/main'
+include { BCFTOOLS_CONCAT } from '../../../modules/nf-core/bcftools/concat/main'
 
 workflow BAM_VCF_SV_CALLING {
     take:
@@ -101,6 +102,22 @@ workflow BAM_VCF_SV_CALLING {
     )
 
     ch_versions = ch_versions.mix(MANTA_SOMATIC.out.versions.first())
+
+    // MODULE: MERGE_VCF
+    ch_merge_vcf_input = MANTA_SOMATIC.out.somatic_sv_vcf.join(MANTA_SOMATIC.out.somatic_sv_vcf_tbi)
+        .map { meta, vcf, tbi ->
+            [ meta + [ id: "${meta.subject_id}.somatic_sv" ], vcf, tbi ]
+        }
+        .groupTuple()
+        .map { meta, vcfs, tbis ->
+            [ meta, vcfs.toSorted(), tbis.toSorted() ]
+        }
+
+    BCFTOOLS_CONCAT(
+        ch_merge_vcf_input
+    )
+
+    ch_versions = ch_versions.mix(BCFTOOLS_CONCAT.out.versions.first())
 
     emit:
     versions = ch_versions // channel: [ versions.yml ]
