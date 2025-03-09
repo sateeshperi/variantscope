@@ -89,6 +89,9 @@ workflow BAM_VCF_SV_CALLING {
                 [ [ id: meta.id, tumor_id:meta.tumor_id, normal_id:meta.normal_id, subject_id:meta.subject_id, ], bam, bai ]
             }
         )
+        .filter { _meta, t_bam, _t_bai, n_bam, _n_bai ->
+            t_bam.size() > 1048576 && n_bam.size() > 1048576
+        } // Both BAMs should be greater than 1 MB otherwise MANTA generally fails
 
     MANTA_SOMATIC(
         ch_manta_somatic_input,
