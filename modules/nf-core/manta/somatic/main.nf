@@ -1,7 +1,6 @@
 process MANTA_SOMATIC {
     tag "${meta.id}"
-    label 'process_very_high'
-    label 'error_retry'
+    label 'process_high'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
