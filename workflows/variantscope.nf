@@ -65,39 +65,39 @@ workflow VARIANTSCOPE {
         ch_bam,
         ch_genome,
         ch_genome_fai,
-        ch_genome_dict ?: [],
-        ch_genome_version ?: [],
-        ch_bwa_index ?: [],
-        ch_dbsnp ?: []
+        ch_genome_dict,
+        ch_genome_version,
+        ch_bwa_index,
+        ch_dbsnp
     )
 
-    // ch_versions = ch_versions.mix(BAM_VCF_SV_CALLING.out.versions)
+    ch_versions = ch_versions.mix(BAM_VCF_SV_CALLING.out.versions)
 
     // CNV calling Subworkflow
-    // CNV_CALLING(
-    //     ch_bam,
-    //     ch_genome,
-    //     ch_genome_fai,
-    //     ch_genome_dict,
-    //     ch_genome_version,
-    //     ch_amber_germline_sites,
-    //     ch_gc_profile,
-    //     ch_ensembl_path,
-    //     BAM_VCF_SV_CALLING.out.vcf_filtered
-    // )
+    CNV_CALLING(
+        ch_bam,
+        ch_genome,
+        ch_genome_fai,
+        ch_genome_dict,
+        ch_genome_version,
+        ch_amber_germline_sites,
+        ch_gc_profile,
+        ch_ensembl_path,
+        BAM_VCF_SV_CALLING.out.vcf_filtered
+    )
 
-    // ch_versions = ch_versions.mix(CNV_CALLING.out.versions)
+    ch_versions = ch_versions.mix(CNV_CALLING.out.versions)
 
     // SV Event calling Subworkflow
-    // SV_EVENT_CALLING(
-    //     CNV_CALLING.out.purple_dir,
-    //     ch_genome_version,
-    //     ch_ensembl_path,
-    //     ch_known_fusion,
-    //     ch_driver_genes
-    // )
+    SV_EVENT_CALLING(
+        CNV_CALLING.out.purple_dir,
+        ch_genome_version,
+        ch_ensembl_path,
+        ch_known_fusion,
+        ch_driver_genes
+    )
 
-    // ch_versions = ch_versions.mix(SV_EVENT_CALLING.out.versions)
+    ch_versions = ch_versions.mix(SV_EVENT_CALLING.out.versions)
 
     //
     // Collate and save software versions

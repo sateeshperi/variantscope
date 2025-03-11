@@ -21,37 +21,37 @@ workflow BAM_VCF_SV_CALLING {
     ch_versions = Channel.empty()
 
     // GRIDSS
-    // GRIDSS(
-    //     ch_bam,
-    //     ch_genome,
-    //     ch_genome_fai,
-    //     ch_genome_dict
-    // )
+    GRIDSS(
+        ch_bam,
+        ch_genome,
+        ch_genome_fai,
+        ch_genome_dict
+    )
 
-    // ch_versions = ch_versions.mix(GRIDSS.out.versions.first())
+    ch_versions = ch_versions.mix(GRIDSS.out.versions.first())
 
     // GRIPSS
-    // GRIPSS_SOMATIC(
-    //     GRIDSS.out.vcf,
-    //     ch_genome_version,
-    //     ch_genome,
-    //     ch_genome_fai,
-    //     ch_genome_dict
-    // )
+    GRIPSS_SOMATIC(
+        GRIDSS.out.vcf,
+        ch_genome_version,
+        ch_genome,
+        ch_genome_fai,
+        ch_genome_dict
+    )
 
-    // ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
+    ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
 
     // SVABA
-    // SVABA(
-    //     ch_bam,
-    //     ch_genome,
-    //     ch_genome_fai,
-    //     ch_genome_dict,
-    //     ch_dbsnp,
-    //     ch_bwa_index
-    // )
+    SVABA(
+        ch_bam,
+        ch_genome,
+        ch_genome_fai,
+        ch_genome_dict,
+        ch_dbsnp,
+        ch_bwa_index
+    )
 
-    // ch_versions = ch_versions.mix(SVABA.out.versions.first())
+    ch_versions = ch_versions.mix(SVABA.out.versions.first())
 
     // MODULE: SPLIT_BAM
     ch_split_bam_input = ch_bam.map { meta, t_bam, t_bai, _n_bam, _n_bai ->
@@ -120,5 +120,7 @@ workflow BAM_VCF_SV_CALLING {
     ch_versions = ch_versions.mix(BCFTOOLS_CONCAT.out.versions.first())
 
     emit:
+    vcf_filtered = GRIPSS_SOMATIC.out.vcf_filtered
+    vcf_somatic = GRIPSS_SOMATIC.out.vcf_somatic
     versions = ch_versions // channel: [ versions.yml ]
 }
