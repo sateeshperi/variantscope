@@ -25,7 +25,7 @@ workflow VARIANTSCOPE {
     ch_genome_dict
     ch_genome_version
     ch_amber_germline_sites
-    ch_gc_profile        
+    ch_gc_profile
     ch_ensembl_path
     ch_bwa_index
     ch_known_fusion
@@ -63,7 +63,7 @@ workflow VARIANTSCOPE {
     // SV calling Subworkflow
     BAM_VCF_SV_CALLING(
         ch_bam,
-        ch_genome,    
+        ch_genome,
         ch_genome_fai,
         ch_genome_dict,
         ch_genome_version,

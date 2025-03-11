@@ -1,7 +1,6 @@
 process MANTA_SOMATIC {
     tag "${meta.id}"
-    label 'process_very_high'
-    label 'error_retry'
+    label 'process_high'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -15,14 +14,16 @@ process MANTA_SOMATIC {
     path genome_dict
 
     output:
-    tuple val(meta), path("*.candidate_small_indels.vcf.gz")     , emit: candidate_small_indels_vcf
-    tuple val(meta), path("*.candidate_small_indels.vcf.gz.tbi") , emit: candidate_small_indels_vcf_tbi
-    tuple val(meta), path("*.candidate_sv.vcf.gz")               , emit: candidate_sv_vcf
-    tuple val(meta), path("*.candidate_sv.vcf.gz.tbi")           , emit: candidate_sv_vcf_tbi
-    tuple val(meta), path("*.diploid_sv.vcf.gz")                 , emit: diploid_sv_vcf
-    tuple val(meta), path("*.diploid_sv.vcf.gz.tbi")             , emit: diploid_sv_vcf_tbi
-    tuple val(meta), path("*.somatic_sv.vcf.gz")                 , emit: somatic_sv_vcf
-    tuple val(meta), path("*.somatic_sv.vcf.gz.tbi")             , emit: somatic_sv_vcf_tbi
+    tuple val(meta), path("*.candidate_small_indels.vcf.gz")     , emit: candidate_small_indels_vcf     , optional: true
+    tuple val(meta), path("*.candidate_small_indels.vcf.gz.tbi") , emit: candidate_small_indels_vcf_tbi , optional: true 
+    tuple val(meta), path("*.candidate_sv.vcf.gz")               , emit: candidate_sv_vcf               , optional: true
+    tuple val(meta), path("*.candidate_sv.vcf.gz.tbi")           , emit: candidate_sv_vcf_tbi           , optional: true
+    tuple val(meta), path("*.diploid_sv.vcf.gz")                 , emit: diploid_sv_vcf                 , optional: true
+    tuple val(meta), path("*.diploid_sv.vcf.gz.tbi")             , emit: diploid_sv_vcf_tbi             , optional: true
+    tuple val(meta), path("*.somatic_sv.vcf.gz")                 , emit: somatic_sv_vcf                 , optional: true
+    tuple val(meta), path("*.somatic_sv.vcf.gz.tbi")             , emit: somatic_sv_vcf_tbi             , optional: true
+    tuple val(meta), path("*.log")                               , emit: log
+    tuple val(meta), path("*.err")                               , emit: err
     path "versions.yml"                                          , emit: versions
 
     script:
@@ -35,7 +36,31 @@ process MANTA_SOMATIC {
         --reference ${genome} \\
         --runDir manta 
 
-    python manta/runWorkflow.py -m local -j ${task.cpus}
+    python \\
+        manta/runWorkflow.py \\
+        -m local \\
+        -j ${task.cpus} \\
+        > >(tee ${prefix}.log >&1) \\
+        2> >(tee ${prefix}.err >&2) \\
+        || true
+    
+    if grep -q "Too few high-confidence read pairs" "${prefix}.err"; then
+        echo "Manta failed due to too few high-confidence read pairs"
+        
+        cat <<-END_VERSIONS > versions.yml
+        "${task.process}":
+            manta: "\$(configManta.py --version)"
+    END_VERSIONS
+        
+        exit 0
+    fi
+
+    if grep -q "Workflow successfully completed all tasks" "${prefix}.err"; then
+        echo "Manta completed successfully"
+    else
+        echo "Manta failed. See log file for details"
+        exit 1
+    fi
 
     mv manta/results/variants/candidateSmallIndels.vcf.gz \\
         ${prefix}.candidate_small_indels.vcf.gz
@@ -71,6 +96,9 @@ process MANTA_SOMATIC {
     touch ${prefix}.diploid_sv.vcf.gz.tbi
     echo "" | gzip > ${prefix}.somatic_sv.vcf.gz
     touch ${prefix}.somatic_sv.vcf.gz.tbi
+
+    touch ${prefix}.log
+    touch ${prefix}.err
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
