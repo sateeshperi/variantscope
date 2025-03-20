@@ -27,6 +27,7 @@ process SPLIT_BAM {
     echo "Getting list of contigs and their sizes..."
     contigs=(\$(samtools idxstats $input | cut -f1 | grep -v '*'))
     sizes=(\$(samtools idxstats $input | cut -f2 | grep -v '*'))
+    num_contigs=\${#contigs[@]}
 
     total_size=0
     for size in "\${sizes[@]}"; do
@@ -77,7 +78,7 @@ process SPLIT_BAM {
         echo "Contigs in chunk \$i: \${chunk_contigs[@]}"
 
         echo "Running samtools view for chunk \$i..."
-        samtools view -b \$args --threads ${task.cpus-1} $input "\${chunk_contigs[@]}" \
+        samtools view -b $args --threads ${task.cpus-1} $input "\${chunk_contigs[@]}" \
             > "${prefix}.chunk\${i}.split.bam"
 
         echo "Chunk \$i BAM file created: ${prefix}.chunk\${i}.split.bam"
