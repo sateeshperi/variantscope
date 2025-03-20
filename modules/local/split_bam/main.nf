@@ -7,13 +7,15 @@ process SPLIT_BAM {
         'biocontainers/samtools:1.21--h50ea8bc_0' }"
 
     input:
-    tuple val(meta), path(input), path(index)
+    tuple val(meta), path(t_bam), path(t_bai), path(n_bam), path(n_bai)
     val num_chunks
     val chunk_overlap
 
     output:
-    tuple val(meta), path("*.split.bam")        , emit: bam
-    tuple val(meta), path("*.split.bam.bai")    , emit: bai
+    tuple val(meta), path("*.tumor.bam")        , emit: t_bam
+    tuple val(meta), path("*.tumor.bam.bai")    , emit: t_bai
+    tuple val(meta), path("*.normal.bam")       , emit: n_bam
+    tuple val(meta), path("*.normal.bam.bai")   , emit: n_bai
     path  "versions.yml"                        , emit: versions
 
     when:
@@ -24,38 +26,51 @@ process SPLIT_BAM {
     def args2 = task.ext.args2 ?: ''
     def prefix = task.ext.prefix ?: "$meta.id"
     """
-    echo "Getting list of contigs and their sizes..."
-    contigs=(\$(samtools idxstats $input | cut -f1 | grep -v '*'))
-    sizes=(\$(samtools idxstats $input | cut -f2 | grep -v '*'))
+    echo -e "Getting list of contigs and their sizes from the tumor bam...\\n"
+
+    contigs=(\$(samtools idxstats $t_bam | cut -f1 | grep -v '*'))
+    sizes=(\$(samtools idxstats $t_bam | cut -f2 | grep -v '*'))
     num_contigs=\${#contigs[@]}
+
+    echo -e "Found contigs: \${contigs[@]}, with sizes: \${sizes[@]}\\n"
 
     total_size=0
     for size in "\${sizes[@]}"; do
         total_size=\$((total_size + size))
     done
 
-    echo "Total genomic size: \$total_size bp"
+    echo -e "Total genomic size: \$total_size bp\\n"
 
-    chunk_size=\$((total_size / $num_chunks))
-    echo "Chunk size: \$chunk_size bp"
+    echo -e "Get a list of normal bam contigs..."
+    n_bam_contigs=(\$(samtools idxstats $n_bam | cut -f1 | grep -v '*'))
+    echo -e "Normal bam contigs: \${n_bam_contigs[@]}\\n"
+
+    num_possible_chunks=$num_chunks
+    if (($num_chunks > num_contigs)); then
+        num_possible_chunks=\$num_contigs
+        echo -e "Number of chunks is greater than the number of contigs. Setting number of chunks to the number of contigs: \$num_possible_chunks\\n"
+    fi
+
+    chunk_size=\$((total_size / \$num_possible_chunks))
+    echo -e "Chunk size: \$chunk_size bp"
 
     overlap_size=\$((chunk_size * $chunk_overlap / 100))
     step_size=\$((chunk_size - overlap_size))
 
-    echo "Overlap size: \$overlap_size bp"
-    echo "Step size: \$step_size bp"
+    echo -e "Overlap size: \$overlap_size bp"
+    echo -e "Step size: \$step_size bp\\n"
 
     start=0
-    for ((i = 1; i <= $num_chunks; i++)); do
-        echo "Processing chunk \$i..."
+    last_chunk_contigs=()
+    for ((i = 1; i <= \$num_possible_chunks; i++)); do
+        echo -e "Processing chunk \$i..."
 
         end=\$((start + chunk_size))
-        if ((i == $num_chunks)); then
+        if ((i == \$num_possible_chunks)); then
             end=\$total_size  # Ensure last chunk includes all remaining bases
         fi
-        echo "Chunk \$i: Start = \$start, End = \$end"
+        echo -e "Chunk \$i: Start = \$start, End = \$end"
 
-        # Determine which contigs belong to the current chunk based on genomic positions
         chunk_start=\$start
         chunk_end=\$end
         chunk_contigs=()
@@ -65,30 +80,45 @@ process SPLIT_BAM {
             contig_size=\${sizes[j]}
             contig_end=\$((chunk_position + contig_size))
 
-            # Add contig to the chunk if it overlaps with the chunk's range
             if ((chunk_end > chunk_position && chunk_start < contig_end)); then
                 chunk_contigs+=("\${contigs[j]}")
-                echo "Adding contig \${contigs[j]} to chunk \$i"
+                echo -e "Adding contig \${contigs[j]} to chunk \$i"
             fi
 
-            # Update the position for the next contig
             chunk_position=\$contig_end
         done
 
-        echo "Contigs in chunk \$i: \${chunk_contigs[@]}"
+        echo -e "Contigs in chunk \$i: \${chunk_contigs[@]}"
 
-        echo "Running samtools view for chunk \$i..."
-        samtools view -b $args --threads ${task.cpus-1} $input "\${chunk_contigs[@]}" \
-            > "${prefix}.chunk\${i}.split.bam"
+        if [ "\$(printf "%s " "\${chunk_contigs[@]}")" == "\$(printf "%s " "\${last_chunk_contigs[@]}")" ]; then
+            echo -e "Chunk \$i has the same contigs as the previous chunk. Skipping...\\n"
+            continue
+        fi
 
-        echo "Chunk \$i BAM file created: ${prefix}.chunk\${i}.split.bam"
+        echo -e "Running samtools view on tumor bam for chunk \$i..."
+
+        samtools view -b $args --threads ${task.cpus-1} $t_bam "\${chunk_contigs[@]}" \
+            > "${prefix}.chunk\${i}.tumor.bam"
+
+        echo -e "Make sure normal bam has the chunk contigs..."
+        intersection_contigs=(\$(comm -12 <(printf "%s\\n" "\${n_bam_contigs[@]}" | sort) <(printf "%s\\n" "\${chunk_contigs[@]}" | sort)))
+        echo -e "Intersection contigs: \${intersection_contigs[@]}"
+
+        echo -e "Running samtools view on normal bam for chunk \$i..."
+
+        samtools view -b $args --threads ${task.cpus-1} $n_bam "\${intersection_contigs[@]}" \
+            > "${prefix}.chunk\${i}.normal.bam"
+
+        echo -e "Chunk \$i BAM files created: ${prefix}.chunk\${i}.tumor.bam, ${prefix}.chunk\${i}.normal.bam\\n"
 
         start=\$((start + step_size))
+        last_chunk_contigs=("\${chunk_contigs[@]}")
     done
 
-    echo "Chunking complete!"
+    echo -e "Chunking complete!"
 
-    for bam in *.split.bam; do
+    for bam in *.chunk*bam; do
+        echo -e "Indexing \$bam..."
         samtools \\
             index \\
             -@ ${task.cpus-1} \\
@@ -96,7 +126,7 @@ process SPLIT_BAM {
             "\$bam"
     done
 
-    echo "Indexing complete!"
+    echo -e "Indexing complete!"
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -3,11 +3,11 @@ include { GRIPSS_SOMATIC } from '../../../modules/local/gripss/somatic/main'
 
 include { SVABA } from '../../../modules/nf-core/svaba/main'
 include { BCFTOOLS_INDEX } from '../../../modules/nf-core/bcftools/index/main'
-include { BCFTOOLS_CONCAT as CONCAT_SVABA_VCF } from '../../../modules/nf-core/bcftools/concat/main'
+include { BCFTOOLS_CONCAT as CONCATSVABA } from '../../../modules/nf-core/bcftools/concat/main'
 
 include { SPLIT_BAM } from '../../../modules/local/split_bam/main'
 include { MANTA_SOMATIC } from '../../../modules/nf-core/manta/somatic/main'
-include { BCFTOOLS_CONCAT as CONCAT_MANTA_VCF } from '../../../modules/nf-core/bcftools/concat/main'
+include { BCFTOOLS_CONCAT as CONCATMANTA } from '../../../modules/nf-core/bcftools/concat/main'
 
 workflow BAM_VCF_SV_CALLING {
     take:
@@ -47,53 +47,30 @@ workflow BAM_VCF_SV_CALLING {
     ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
 
     // MODULE: SPLIT_BAM
-    ch_split_bam_input = ch_bam.map { meta, t_bam, t_bai, _n_bam, _n_bai ->
-            [ meta + [ subject_id: meta.id, id: meta.tumor_id, is_tumor: true ], t_bam, t_bai ]
-        }.mix(
-            ch_bam.map { meta, _t_bam, _t_bai, n_bam, n_bai ->
-                [ meta + [ subject_id: meta.id, id: meta.normal_id, is_tumor: false ], n_bam, n_bai ]
-            }
-        )
-
     SPLIT_BAM (
-        ch_split_bam_input,
+        ch_bam,
         val_num_chunks,
         val_chunk_overlap
     )
 
-    ch_split_bam_output = SPLIT_BAM.out.bam.join(SPLIT_BAM.out.bai)
-        .flatMap { meta, bams, bais ->
-            bams.withIndex().collect { bam, i ->
-                [ meta, bam, bais[i] ]
-            }
-        }
-        .map { meta, bam, bai ->
-            def contig_id = bam.name.tokenize('.')[-3]
-
-            [ meta + [ id: "${meta.subject_id}_${contig_id}" ], bam, bai ]
-
-        }.branch { meta, _bam, _bai ->
-            tumor: meta.is_tumor
-            normal: ! meta.is_tumor
-        }
-
-    ch_caller_input = ch_split_bam_output.tumor.map { meta, bam, bai ->
-            [ [ id: meta.id, tumor_id:meta.tumor_id, normal_id:meta.normal_id, subject_id:meta.subject_id, ], bam, bai ]
-        }.join(
-            ch_split_bam_output.normal.map { meta, bam, bai ->
-                [ [ id: meta.id, tumor_id:meta.tumor_id, normal_id:meta.normal_id, subject_id:meta.subject_id, ], bam, bai ]
-            }
-        )
+    ch_split_bam_output = SPLIT_BAM.out.t_bam
+        .join(SPLIT_BAM.out.t_bai)
+        .join(SPLIT_BAM.out.n_bam)
+        .join(SPLIT_BAM.out.n_bai)
         .filter { _meta, t_bam, _t_bai, n_bam, _n_bai ->
             t_bam.size() > 1048576 && n_bam.size() > 1048576
         } // Both BAMs should be greater than 1 MB otherwise MANTA generally fails
+        .map { meta, t_bam, t_bai, n_bam, n_bai ->
+            def chunk_id = (t_bam.name =~ /chunk(.*?)\.tumor/)[0][1]
+            [ meta + [ id: "${meta.id}_chunk$chunk_id", subject_id: "${meta.id}" ], t_bam, t_bai, n_bam, n_bai ]
+        }
 
 
     ch_versions = ch_versions.mix(SPLIT_BAM.out.versions.first())
 
     // SVABA
     SVABA(
-        ch_caller_input,
+        ch_split_bam_output,
         ch_genome,
         ch_genome_fai,
         ch_genome_dict,
@@ -108,7 +85,7 @@ workflow BAM_VCF_SV_CALLING {
 
     ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions.first())
 
-    // MODULE: CONCAT_SVABA_VCF
+    // MODULE: CONCATSVABA
     ch_concat_svaba_input = SVABA.out.sv.join(BCFTOOLS_INDEX.out.tbi)
         .map { meta, vcf, tbi ->
             [ meta + [ id: "${meta.subject_id}" ], vcf, tbi ]
@@ -118,15 +95,15 @@ workflow BAM_VCF_SV_CALLING {
             [ meta, vcfs.toSorted(), tbis.toSorted() ]
         }
 
-    CONCAT_SVABA_VCF(
+    CONCATSVABA(
         ch_concat_svaba_input
     )
 
-    ch_versions = ch_versions.mix(CONCAT_MANTA_VCF.out.versions.first())
+    ch_versions = ch_versions.mix(CONCATSVABA.out.versions.first())
 
     // MANTA
     MANTA_SOMATIC(
-        ch_caller_input,
+        ch_split_bam_output,
         ch_genome,
         ch_genome_fai,
         ch_genome_dict,
@@ -135,7 +112,7 @@ workflow BAM_VCF_SV_CALLING {
     ch_versions = ch_versions.mix(MANTA_SOMATIC.out.versions.first())
 
     // MODULE: CONCAT_MANTA_VCF
-    ch_merge_vcf_input = MANTA_SOMATIC.out.somatic_sv_vcf.join(MANTA_SOMATIC.out.somatic_sv_vcf_tbi)
+    ch_concat_vcf_input = MANTA_SOMATIC.out.somatic_sv_vcf.join(MANTA_SOMATIC.out.somatic_sv_vcf_tbi)
         .map { meta, vcf, tbi ->
             [ meta + [ id: "${meta.subject_id}.somatic_sv" ], vcf, tbi ]
         }
@@ -144,11 +121,11 @@ workflow BAM_VCF_SV_CALLING {
             [ meta, vcfs.toSorted(), tbis.toSorted() ]
         }
 
-    CONCAT_MANTA_VCF(
-        ch_merge_vcf_input
+    CONCATMANTA(
+        ch_concat_vcf_input
     )
 
-    ch_versions = ch_versions.mix(CONCAT_MANTA_VCF.out.versions.first())
+    ch_versions = ch_versions.mix(CONCATMANTA.out.versions.first())
 
     emit:
     vcf_filtered = GRIPSS_SOMATIC.out.vcf_filtered
