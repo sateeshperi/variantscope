@@ -77,14 +77,14 @@ workflow BAM_VCF_SV_CALLING {
     ch_versions = ch_versions.mix(SVABA.out.versions.first())
 
     // MODULE: BCFTOOLS_INDEX
-    BCFTOOLS_INDEX ( SVABA.out.sv )
+    BCFTOOLS_INDEX ( SVABA.out.som_sv )
 
     ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions.first())
 
     // MODULE: CONCATSVABA
-    ch_concat_svaba_input = SVABA.out.sv.join(BCFTOOLS_INDEX.out.tbi)
+    ch_concat_svaba_input = SVABA.out.som_sv.join(BCFTOOLS_INDEX.out.tbi)
         .map { meta, vcf, tbi ->
-            [ meta + [ id: "${meta.subject_id}" ], vcf, tbi ]
+            [ meta + [ id: "${meta.subject_id}.somatic.sv" ], vcf, tbi ]
         }
         .groupTuple()
         .map { meta, vcfs, tbis ->
