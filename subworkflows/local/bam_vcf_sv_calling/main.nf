@@ -82,7 +82,7 @@ workflow BAM_VCF_SV_CALLING {
     ch_versions = ch_versions.mix(BCFTOOLS_INDEX.out.versions.first())
 
     // MODULE: CONCATSVABA
-    ch_concat_svaba_input = SVABA.out.som_sv.join(BCFTOOLS_INDEX.out.tbi)
+    ch_concat_svaba_input = BCFTOOLS_INDEX.out.vcf.join(BCFTOOLS_INDEX.out.tbi)
         .map { meta, vcf, tbi ->
             [ meta + [ id: "${meta.subject_id}.somatic.sv" ], vcf, tbi ]
         }

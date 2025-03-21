@@ -58,7 +58,7 @@ process SVABA {
     sed -i 's|${tumorbam}|${id_subj}_tumor|g' ${meta.id}.svaba.somatic.sv.vcf
     sed -i 's|${normalbam}|${id_subj}_normal|g' ${meta.id}.svaba.somatic.sv.vcf
 
-    bgzip \\
+    gzip \\
         ${meta.id}.svaba.somatic.sv.vcf
 
     cat <<-END_VERSIONS > versions.yml
