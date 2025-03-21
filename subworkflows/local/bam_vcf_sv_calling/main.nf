@@ -53,17 +53,13 @@ workflow BAM_VCF_SV_CALLING {
         val_chunk_overlap
     )
 
-    ch_split_bam_output = SPLIT_BAM.out.t_bam
-        .join(SPLIT_BAM.out.t_bai)
-        .join(SPLIT_BAM.out.n_bam)
-        .join(SPLIT_BAM.out.n_bai)
+    ch_split_bam_output = SPLIT_BAM.out.t_bam.flatMap { meta, files -> files.collect { [ meta, it ] } }.map { addChunkID(it) }
+        .join( SPLIT_BAM.out.t_bai.flatMap { meta, files -> files.collect { [ meta, it ] } }.map { addChunkID(it) } )
+        .join( SPLIT_BAM.out.n_bam.flatMap { meta, files -> files.collect { [ meta, it ] } }.map { addChunkID(it) } )
+        .join( SPLIT_BAM.out.n_bai.flatMap { meta, files -> files.collect { [ meta, it ] } }.map { addChunkID(it) } )
         .filter { _meta, t_bam, _t_bai, n_bam, _n_bai ->
             t_bam.size() > 1048576 && n_bam.size() > 1048576
         } // Both BAMs should be greater than 1 MB otherwise MANTA generally fails
-        .map { meta, t_bam, t_bai, n_bam, n_bai ->
-            def chunk_id = (t_bam.name =~ /chunk(.*?)\.tumor/)[0][1]
-            [ meta + [ id: "${meta.id}_chunk$chunk_id", subject_id: "${meta.id}" ], t_bam, t_bai, n_bam, n_bai ]
-        }
 
 
     ch_versions = ch_versions.mix(SPLIT_BAM.out.versions.first())
@@ -131,4 +127,10 @@ workflow BAM_VCF_SV_CALLING {
     vcf_filtered = GRIPSS_SOMATIC.out.vcf_filtered
     vcf_somatic = GRIPSS_SOMATIC.out.vcf_somatic
     versions = ch_versions // channel: [ versions.yml ]
+}
+
+def addChunkID(meta, dataFile) {
+    def chunk_id = (dataFile.name =~ /chunk(.*?)\.(tumor|normal)/)[0][1]
+
+    [ meta + [ id: "${meta.id}_chunk$chunk_id", subject_id: "${meta.id}" ], dataFile ]
 }
