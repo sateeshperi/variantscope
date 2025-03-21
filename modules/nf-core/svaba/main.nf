@@ -40,6 +40,7 @@ process SVABA {
     def bamlist = normalbam       ? "-t ${tumorbam} -n ${normalbam}" : "-t ${tumorbam}"
     def dbsnp   = dbsnp           ? "--dbsnp-vcf ${dbsnp}"           : ""
     def bwa     = bwa_index       ? "cp -s ${bwa_index}/*38* ."      : ""
+    def id_subj = "${meta.id}".tokenize('_chunk')[0]
     """
     ${bwa}
 
@@ -50,6 +51,15 @@ process SVABA {
         --id-string ${meta.id} \\
         --reference-genome ${genome} \\
         --g-zip
+
+    gzip -d \\
+        ${meta.id}.svaba.somatic.sv.vcf.gz
+
+    sed -i 's|${tumorbam}|${id_subj}_tumor|g' ${meta.id}.svaba.somatic.sv.vcf
+    sed -i 's|${normalbam}|${id_subj}_normal|g' ${meta.id}.svaba.somatic.sv.vcf
+
+    bgzip \\
+        ${meta.id}.svaba.somatic.sv.vcf
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
