@@ -34,7 +34,7 @@ process BCFTOOLS_INDEX {
         index \\
         $args \\
         --threads $task.cpus \\
-        ${prefix}.bgzip.vcf
+        ${prefix}.bgzip.vcf.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
