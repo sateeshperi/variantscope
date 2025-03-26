@@ -1,0 +1,60 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/SowpatiLab/variantscope/master/assets/schema_input.json",
+    "title": "SowpatiLab/variantscope pipeline - params.input schema",
+    "description": "Schema for the file provided with params.input",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "subject_id": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Subject ID must be provided and cannot contain spaces"
+            },
+            "sample_id": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Sample ID must be provided and cannot contain spaces"
+            },
+            "sample_type": {
+                "type": "string",
+                "enum": ["tumor", "normal"],
+                "errorMessage": "Sample type must be either 'tumor' or 'normal'"
+            },
+            "sequence_type": {
+                "type": "string",
+                "enum": ["dna"],
+                "errorMessage": "Sequence type must be 'dna'"
+            },
+            "filetype": {
+                "type": "string",
+                "enum": ["bam"],
+                "errorMessage": "File type must be 'bam'"
+            },
+            "filepath": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.bam$",
+                "errorMessage": "BAM file path must be provided, cannot contain spaces and must have extension '.bam'"
+            },
+            "indexpath": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.bam\\.bai$",
+                "errorMessage": "BAM index file path must be provided, cannot contain spaces and must have extension '.bam.bai'"
+            }
+        },
+        "required": [
+            "subject_id",
+            "sample_id",
+            "sample_type",
+            "sequence_type",
+            "filetype",
+            "filepath",
+            "indexpath"
+        ]
+    }
+}
