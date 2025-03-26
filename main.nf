@@ -48,7 +48,9 @@ workflow SOWPATILAB_VARIANTSCOPE {
         params.bwa_index,
         params.known_fusion,
         params.driver_genes,
-        params.dbsnp
+        params.dbsnp,
+        params.num_chunks,
+        params.chunk_overlap
     )
 }
 /*

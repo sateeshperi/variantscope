@@ -31,6 +31,8 @@ workflow VARIANTSCOPE {
     ch_known_fusion
     ch_driver_genes
     ch_dbsnp
+    val_num_chunks          // Integer: Number of chunks to split the BAM files into
+    val_chunk_overlap       // Integer: Percentage of overlap between chunks, e.g. 10 = 10% overlap
 
     main:
 
@@ -68,7 +70,9 @@ workflow VARIANTSCOPE {
         ch_genome_dict,
         ch_genome_version,
         ch_bwa_index,
-        ch_dbsnp
+        ch_dbsnp,
+        val_num_chunks,
+        val_chunk_overlap
     )
 
     ch_versions = ch_versions.mix(BAM_VCF_SV_CALLING.out.versions)
