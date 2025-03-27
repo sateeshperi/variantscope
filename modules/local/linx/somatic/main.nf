@@ -21,6 +21,8 @@ process LINX_SOMATIC {
     script:
     def args = task.ext.args ?: ''
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     linx \\
         -Xmx${Math.round(task.memory.bytes * 0.95)} \\
         -sample ${meta.tumor_id} \\
@@ -31,7 +33,7 @@ process LINX_SOMATIC {
         -known_fusion_file ${known_fusion} \\
         -driver_gene_panel ${driver_genes} \\
         -output_dir linx_somatic/ \\
-        -threads ${task.cpus} \\
+        -threads \${n_proc} \\
         -log_debug \\
         -write_all
 

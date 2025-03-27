@@ -42,11 +42,13 @@ process SVABA {
     def bwa     = bwa_index       ? "cp -s ${bwa_index}/*38* ."      : ""
     def id_subj = "${meta.id}".tokenize('_chunk')[0]
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     ${bwa}
 
     svaba run \\
         ${bamlist} \\
-        --threads ${task.cpus} \\
+        --threads \${n_proc} \\
         ${dbsnp} \\
         --id-string ${meta.id} \\
         --reference-genome ${genome} \\

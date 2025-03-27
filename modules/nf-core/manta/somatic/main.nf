@@ -30,6 +30,8 @@ process MANTA_SOMATIC {
     def args   = task.ext.args   ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     configManta.py \\
         --tumorBam ${tumorbam} \\
         --normalBam ${normalbam} \\
@@ -39,7 +41,7 @@ process MANTA_SOMATIC {
     python \\
         manta/runWorkflow.py \\
         -m local \\
-        -j ${task.cpus} \\
+        -j \${n_proc} \\
         > >(tee ${prefix}.log >&1) \\
         2> >(tee ${prefix}.err >&2) \\
         || true
