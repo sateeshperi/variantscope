@@ -26,25 +26,25 @@ workflow BAM_VCF_SV_CALLING {
     ch_versions = Channel.empty()
 
     // GRIDSS
-    GRIDSS(
-        ch_bam,
-        ch_genome,
-        ch_genome_fai,
-        ch_genome_dict
-    )
+    // GRIDSS(
+    //     ch_bam,
+    //     ch_genome,
+    //     ch_genome_fai,
+    //     ch_genome_dict
+    // )
 
-    ch_versions = ch_versions.mix(GRIDSS.out.versions.first())
+    // ch_versions = ch_versions.mix(GRIDSS.out.versions.first())
 
-    // GRIPSS
-    GRIPSS_SOMATIC(
-        GRIDSS.out.vcf,
-        ch_genome_version,
-        ch_genome,
-        ch_genome_fai,
-        ch_genome_dict
-    )
+    // // GRIPSS
+    // GRIPSS_SOMATIC(
+    //     GRIDSS.out.vcf,
+    //     ch_genome_version,
+    //     ch_genome,
+    //     ch_genome_fai,
+    //     ch_genome_dict
+    // )
 
-    ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
+    // ch_versions = ch_versions.mix(GRIPSS_SOMATIC.out.versions.first())
 
     // MODULE: SPLIT_BAM
     SPLIT_BAM (
@@ -124,8 +124,8 @@ workflow BAM_VCF_SV_CALLING {
     ch_versions = ch_versions.mix(CONCATMANTA.out.versions.first())
 
     emit:
-    vcf_filtered = GRIPSS_SOMATIC.out.vcf_filtered
-    vcf_somatic = GRIPSS_SOMATIC.out.vcf_somatic
+    // vcf_filtered = GRIPSS_SOMATIC.out.vcf_filtered
+    // vcf_somatic = GRIPSS_SOMATIC.out.vcf_somatic
     versions = ch_versions // channel: [ versions.yml ]
 }
 

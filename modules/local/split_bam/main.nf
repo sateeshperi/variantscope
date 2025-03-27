@@ -137,8 +137,10 @@ process SPLIT_BAM {
     stub:
     def prefix = task.ext.prefix ?: "$meta.id"
     """
-    touch ${prefix}.chr1.split.bam
-    touch ${prefix}.chr1.split.bam.bai
+    touch ${prefix}.chr1.split.normal.bam
+    touch ${prefix}.chr1.split.normal.bam.bai
+    touch ${prefix}.chr1.split.tumor.bam
+    touch ${prefix}.chr1.split.tumor.bam.bai
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
