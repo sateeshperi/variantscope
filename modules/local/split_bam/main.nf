@@ -26,6 +26,8 @@ process SPLIT_BAM {
     def args2 = task.ext.args2 ?: ''
     def prefix = task.ext.prefix ?: "$meta.id"
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     echo -e "Getting list of contigs and their sizes from the tumor bam...\\n"
 
     contigs=(\$(samtools idxstats $t_bam | cut -f1 | grep -v '*'))
@@ -97,7 +99,7 @@ process SPLIT_BAM {
 
         echo -e "Running samtools view on tumor bam for chunk \$i..."
 
-        samtools view -b $args --threads ${task.cpus-1} $t_bam "\${chunk_contigs[@]}" \
+        samtools view -b $args --threads \$((n_proc-1)) $t_bam "\${chunk_contigs[@]}" \
             > "${prefix}.chunk\${i}.tumor.bam"
 
         echo -e "Make sure normal bam has the chunk contigs..."
@@ -106,7 +108,7 @@ process SPLIT_BAM {
 
         echo -e "Running samtools view on normal bam for chunk \$i..."
 
-        samtools view -b $args --threads ${task.cpus-1} $n_bam "\${intersection_contigs[@]}" \
+        samtools view -b $args --threads \$((n_proc-1)) $n_bam "\${intersection_contigs[@]}" \
             > "${prefix}.chunk\${i}.normal.bam"
 
         echo -e "Chunk \$i BAM files created: ${prefix}.chunk\${i}.tumor.bam, ${prefix}.chunk\${i}.normal.bam\\n"
@@ -121,7 +123,7 @@ process SPLIT_BAM {
         echo -e "Indexing \$bam..."
         samtools \\
             index \\
-            -@ ${task.cpus-1} \\
+            -@ \$((n_proc-1)) \\
             $args2 \\
             "\$bam"
     done

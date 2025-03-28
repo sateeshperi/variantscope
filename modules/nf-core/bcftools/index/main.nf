@@ -23,6 +23,8 @@ process BCFTOOLS_INDEX {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     gzip -cdf \\
         $vcf \\
         > ${prefix}.bgzip.vcf
@@ -33,7 +35,7 @@ process BCFTOOLS_INDEX {
     bcftools \\
         index \\
         $args \\
-        --threads $task.cpus \\
+        --threads \${n_proc} \\
         ${prefix}.bgzip.vcf.gz
 
     cat <<-END_VERSIONS > versions.yml
