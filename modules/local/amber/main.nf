@@ -19,6 +19,8 @@ process AMBER {
     script:
     def args = task.ext.args ?: ''
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     amber \\
         -Xmx${Math.round(task.memory.bytes * 0.95)} \\
         -reference ${meta.normal_id} \\
@@ -26,7 +28,7 @@ process AMBER {
         -tumor ${meta.tumor_id} \\
         -tumor_bam ${tumorbam} \\
         -output_dir amber \\
-        -threads ${task.cpus} \\
+        -threads \${n_proc} \\
         -loci ${amber_germline_sites} \\
         -ref_genome_version ${version}
 

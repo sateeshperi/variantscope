@@ -30,12 +30,14 @@ process BCFTOOLS_CONCAT {
                 args.contains("--output-type v") || args.contains("-Ov") ? "vcf" :
                 "vcf"
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     ${create_input_index}
 
     bcftools concat \\
         --output ${prefix}.${extension} \\
         $args \\
-        --threads $task.cpus \\
+        --threads \${n_proc} \\
         ${vcfs}
 
     cat <<-END_VERSIONS > versions.yml

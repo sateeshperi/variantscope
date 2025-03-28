@@ -19,6 +19,8 @@ process LINX_VISUALISER {
     script:
     def args = task.ext.args ?: ''
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     mkdir -p plots/
 
     linx \\
@@ -29,7 +31,7 @@ process LINX_VISUALISER {
         -ref_genome_version ${genome_version} \\
         -ensembl_data_dir ${ensembl_path} \\
         -circos \$(which circos) \\
-        -threads ${task.cpus} \\
+        -threads \${n_proc} \\
         -plot_out plots/all/ \\
         -data_out data/all/
 

@@ -18,13 +18,15 @@ process COBALT {
     script:
     def args = task.ext.args ?: ''
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     cobalt \\
         -Xmx${Math.round(task.memory.bytes * 0.95)} \\
         -reference ${meta.normal_id} \\
         -reference_bam ${normalbam} \\
         -tumor ${meta.tumor_id} \\
         -tumor_bam ${tumorbam} \\
-        -threads ${task.cpus} \\
+        -threads \${n_proc} \\
         -gc_profile ${gc_profile} \\
         -output_dir cobalt/
 

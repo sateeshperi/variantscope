@@ -21,9 +21,11 @@ process GRIDSS {
     def args   = task.ext.args   ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
+    n_proc=\$(nproc 2>/dev/null || < /proc/cpuinfo grep '^process' -c)
+
     gridss \\
         --reference ${genome} \\
-        --threads ${task.cpus} \\
+        --threads \${n_proc} \\
         --jvmheap ${task.memory.toGiga() - 1}g \\
         --otherjvmheap ${task.memory.toGiga() - 1}g \\
         ${tumorbam} ${normalbam} \\
